@@ -1,6 +1,7 @@
-import { AppShell, Button, Flex, Title } from "@mantine/core";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { AppShell, Flex, Text, Title } from "@mantine/core";
+import { SignedIn, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import Image from "next/image";
 
 export function ApplicationShell({
   children,
@@ -10,15 +11,22 @@ export function ApplicationShell({
   return (
     <AppShell header={{ height: 60 }} padding="md">
       <AppShell.Header>
-        <Flex w="100%" justify="space-between" p="md">
+        <Flex h="100%" gap="md" align="center" justify="center">
+          <div className="relative aspect-[3.664] h-4/6">
+            <Link href="/">
+              <Image
+                src="/assets/images/stamford-logo-clearbg-white.png"
+                alt="stamford logo"
+                fill
+              />
+            </Link>
+          </div>
           <Link href="/">
             <Title order={3}>STYLE WARS</Title>
           </Link>
-          <SignedOut>
-            <Link href="/sign-in">
-              <Button>Sign in</Button>
-            </Link>
-          </SignedOut>
+          <Link href="/playground">
+            <Text tt="uppercase">code</Text>
+          </Link>
           <SignedIn>
             <UserButton />
           </SignedIn>
