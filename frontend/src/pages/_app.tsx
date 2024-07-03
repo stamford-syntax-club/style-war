@@ -3,7 +3,10 @@ import "../styles/globals.css";
 
 import type { AppProps } from "next/app";
 import { createTheme, MantineProvider } from "@mantine/core";
+import { dark } from "@clerk/themes";
 import Head from "next/head";
+import { ClerkProvider } from "@clerk/nextjs";
+import { ApplicationShell } from "@/components/core/appshell";
 
 const theme = createTheme({
   colors: {
@@ -34,7 +37,15 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
 
       <MantineProvider theme={theme} defaultColorScheme="dark">
-        <Component {...pageProps} />
+        <ClerkProvider
+          appearance={{
+            baseTheme: dark,
+          }}
+        >
+          <ApplicationShell>
+            <Component {...pageProps} />
+          </ApplicationShell>
+        </ClerkProvider>
       </MantineProvider>
     </>
   );
