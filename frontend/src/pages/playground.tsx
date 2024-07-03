@@ -1,10 +1,19 @@
-import { Container, Flex } from '@mantine/core'
-import CodeEditor from '@/components/code-editor';
-import Preview from '@/components/preview';
-import { useState } from 'react';
+import { Container, Flex } from "@mantine/core";
+import CodeEditor from "@/components/code-editor";
+import Preview from "@/components/preview";
+import { useState } from "react";
 
 export default function Playground() {
-  const [value, setValue] = useState("<!DOCTYPE html>\n<html>\n<head>\n<style>\n</style>\n</head>\n<body>\n\n</body>\n</html>");
+  const [value, setValue] = useState(
+    `<!DOCTYPE html>
+<html>
+    <head>
+        <style></style>
+    </head>
+    <body>
+    </body>
+</html>`,
+  );
 
   const handleChangeValue = (newValue: string | undefined) => {
     setValue(newValue || "");
