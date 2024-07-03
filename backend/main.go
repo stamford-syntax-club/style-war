@@ -1,13 +1,35 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"net/http"
 
 	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/handler"
 )
 
 func main() {
-	fmt.Println("Hello World")
+	schema, err := graphql.NewSchema(graphql.SchemaConfig{
+		Query: queryType,
+	})
+	if err != nil {
+		log.Fatalf("An error has occured while pasrsing GrahpQL schema: %s", err)
+	}
+
+	h := handler.New(&handler.Config{
+		Schema:     &schema,
+		Pretty:     true,
+		Playground: true,
+	})
+
+	http.Handle("/graphql", h)
+
+	log.Println("Listening on port 8080")
+
+	err = http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatalf("An error has occured while listening on port 8080: %s", err)
+	}
 }
 
 var queryType = graphql.NewObject(graphql.ObjectConfig{
@@ -36,7 +58,7 @@ var challengeType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		"objectives": &graphql.Field{
-			Type: graphql.String,
+			Type: &graphql.Interface{},
 		},
 
 		"isActive": &graphql.Field{
@@ -53,9 +75,14 @@ var challengeQuery = &graphql.Field{
 		},
 	},
 	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-		if id, ok := p.Args["id"].(int); ok {
-			return people[id-1], nil
-		}
-		return nil, nil
+		return Challenge{
+			ID:       1,
+			ImageUrl: "",
+			Objectives: []string{
+				"obj1",
+				"obj2",
+			},
+			IsActive: true,
+		}, nil
 	},
 }
