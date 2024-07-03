@@ -58,7 +58,7 @@ var challengeType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		"objectives": &graphql.Field{
-			Type: &graphql.Interface{},
+			Type: &graphql.List{OfType: graphql.String},
 		},
 
 		"isActive": &graphql.Field{
