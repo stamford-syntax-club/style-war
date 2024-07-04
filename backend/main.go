@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	jwt "github.com/appleboy/gin-jwt"
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -17,8 +17,6 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalln("error loading environment variable: ", err)
 	}
-
-	app := gin.New()
 
 	jwtAuth := &jwt.GinJWTMiddleware{
 		Realm:       "style-wars",
@@ -32,8 +30,12 @@ func main() {
 		},
 		SigningAlgorithm: "HS256",
 	}
+	if err := jwtAuth.MiddlewareInit(); err != nil {
+		log.Fatalf("JWT Middleware initialization failed: %v", err)
+	}
 
-	app.Use(gin.Logger(), cors.Default())
+	app := gin.Default()
+	app.Use(cors.Default())
 
 	h := ws.NewHub()
 
