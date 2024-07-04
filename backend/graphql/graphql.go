@@ -8,7 +8,7 @@ import (
 	"github.com/graphql-go/handler"
 )
 
-func Serve() {
+func CreateHandler() http.Handler {
 	schema, err := graphql.NewSchema(graphql.SchemaConfig{
 		Query: queryType,
 	})
@@ -22,12 +22,5 @@ func Serve() {
 		Playground: true,
 	})
 
-	http.Handle("/graphql", h)
-
-	log.Println("Listening on port 8080")
-
-	err = http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatalf("An error has occured while listening on port 8080: %s", err)
-	}
+	return h
 }
