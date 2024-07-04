@@ -12,7 +12,7 @@ export function useSocket(room: string = "competition") {
   }, [session]);
 
   return useMemo(
-    () => new WebSocket(`ws://localhost:8080/ws/${room}/?token=${token}`),
+    () => new WebSocket(`ws://localhost:8080/ws/${room}?token=${token}`),
     [token],
   );
 }
