@@ -1,88 +1,49 @@
 package main
 
 import (
+	"context"
 	"log"
-	"net/http"
+	"os"
 
-	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/handler"
+	jwt "github.com/appleboy/gin-jwt"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"github.com/stamford-syntax-club/style-war/backend/ws"
 )
 
 func main() {
-	schema, err := graphql.NewSchema(graphql.SchemaConfig{
-		Query: queryType,
-	})
-	if err != nil {
-		log.Fatalf("An error has occured while pasrsing GrahpQL schema: %s", err)
+	if err := godotenv.Load(); err != nil {
+		log.Fatalln("error loading environment variable: ", err)
 	}
 
-	h := handler.New(&handler.Config{
-		Schema:     &schema,
-		Pretty:     true,
-		Playground: true,
+	app := gin.New()
+
+	jwtAuth := &jwt.GinJWTMiddleware{
+		Realm:       "style-wars",
+		Key:         []byte(os.Getenv("JWT_SECRET")),
+		TokenLookup: "query:token",
+		Unauthorized: func(c *gin.Context, code int, message string) {
+			c.JSON(code, gin.H{
+				"code":    code,
+				"message": message,
+			})
+		},
+		SigningAlgorithm: "HS256",
+	}
+
+	app.Use(gin.Logger(), cors.Default())
+
+	h := ws.NewHub()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go h.Run(ctx)
+
+	app.GET("/ws/:room", jwtAuth.MiddlewareFunc(), func(c *gin.Context) {
+		room := c.Param("room")
+		ws.Serve(c, h, room)
 	})
 
-	http.Handle("/graphql", h)
-
-	log.Println("Listening on port 8080")
-
-	err = http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatalf("An error has occured while listening on port 8080: %s", err)
-	}
-}
-
-var queryType = graphql.NewObject(graphql.ObjectConfig{
-	Name: "Query",
-	Fields: graphql.Fields{
-		"challenge": challengeQuery,
-	},
-})
-
-type Challenge struct {
-	ID         int      `json:"id"`
-	ImageUrl   string   `json:"imageUrl"`
-	Objectives []string `json:"objectives"`
-	IsActive   bool     `json:"isActive"`
-}
-
-var challengeType = graphql.NewObject(graphql.ObjectConfig{
-	Name: "Challenge",
-	Fields: graphql.Fields{
-		"id": &graphql.Field{
-			Type: graphql.ID,
-		},
-
-		"imageUrl": &graphql.Field{
-			Type: graphql.String,
-		},
-
-		"objectives": &graphql.Field{
-			Type: &graphql.List{OfType: graphql.String},
-		},
-
-		"isActive": &graphql.Field{
-			Type: graphql.Boolean,
-		},
-	},
-})
-
-var challengeQuery = &graphql.Field{
-	Type: challengeType,
-	Args: graphql.FieldConfigArgument{
-		"id": &graphql.ArgumentConfig{
-			Type: graphql.Int,
-		},
-	},
-	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-		return Challenge{
-			ID:       1,
-			ImageUrl: "",
-			Objectives: []string{
-				"obj1",
-				"obj2",
-			},
-			IsActive: true,
-		}, nil
-	},
+	app.Run(":8080")
 }
