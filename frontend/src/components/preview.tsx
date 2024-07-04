@@ -1,4 +1,4 @@
-import { Paper, Title, Box } from "@mantine/core";
+import { Paper, Title, Box, Button, Flex } from "@mantine/core";
 
 interface PreviewProps {
   value: string;
@@ -7,7 +7,12 @@ interface PreviewProps {
 export default function Preview({ value }: PreviewProps) {
   return (
     <Box className="min-w-[40%]">
-      <Title>Preview</Title>
+      <Flex direction="row" justify="space-between">
+        <Title>Preview</Title>
+        <Button variant="filled" className="mb-1">
+          View Challenge
+        </Button>
+      </Flex>
       <Paper className="min-h-[80vh] border bg-neutral-900 p-1 overflow-hidden">
         <iframe
           title="preview"
