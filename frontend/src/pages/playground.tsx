@@ -20,9 +20,7 @@ export default function Playground() {
   socket.addEventListener("open", (event) => {
     console.log("connection open: ", event);
   });
-  socket.addEventListener("message", (event) => {
-    console.log("message received: ", event.data);
-  });
+
   socket.addEventListener("close", (event) => {
     console.log("WebSocket connection closed:", event.code, event.reason);
   });
