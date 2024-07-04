@@ -45,16 +45,15 @@ func (h *Hub) unregisterClient(client *Client) {
 }
 
 func (h *Hub) handleMessage(msg *Msg) {
-	log.Println(msg)
 	if msg.Event == "code:edit" {
-		// TODO: update to db, broadcast to admin
+		// TODO: update to db
 		log.Printf("%+v\n", msg)
 	}
 
 	// Broadcast to admin
-	// if h.admin != nil {
-	//     h.admin.WriteJSON()
-	// }
+	if h.admin != nil {
+		h.admin.WriteJSON(msg)
+	}
 }
 
 func (h *Hub) Run(ctx context.Context) {

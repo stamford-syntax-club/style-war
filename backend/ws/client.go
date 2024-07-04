@@ -9,6 +9,7 @@ import (
 type Msg struct {
 	Event   string `json:"event"`
 	Content string `json:"content"`
+	UserId  string `json:"userId"`
 }
 
 type Client struct {
@@ -30,7 +31,7 @@ func (c *Client) ReadMessages() {
 	// ws.SetReadDeadline(time.Now().Add(time.Second * 60))
 
 	for {
-		var msg = &Msg{}
+		var msg = &Msg{UserId: c.Id}
 		if err := c.Conn.ReadJSON(msg); err != nil {
 			log.Printf("Error reading message from %s: %v", c.Id, err)
 			break
