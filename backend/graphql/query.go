@@ -6,5 +6,6 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Query",
 	Fields: graphql.Fields{
 		"challenge": challengeQuery,
+		"code":      codeQuery,
 	},
 })
