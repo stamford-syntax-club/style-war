@@ -16,6 +16,9 @@ import (
 )
 
 func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	if err := godotenv.Load(); err != nil {
 		log.Fatalln("error loading environment variable: ", err)
 	}
@@ -35,20 +38,16 @@ func main() {
 	if err := jwtAuth.MiddlewareInit(); err != nil {
 		log.Fatalf("JWT Middleware initialization failed: %v", err)
 	}
-
-	app := gin.Default()
-	app.Use(cors.Default())
-
-	h := websocket.NewHub()
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	go h.Run(ctx)
-
 	challengeRepo := challenge.NewChallengeRepo()
 	challengeQuery := challenge.NewGqlQuery(challengeRepo)
 	codeRepo := code.NewCodeRepo()
 	codeQuery := code.NewGqlQuery(codeRepo)
+
+	app := gin.Default()
+	app.Use(cors.Default())
+
+	h := websocket.NewHub(codeRepo)
+	go h.Run(ctx)
 
 	gqlHandler := graphql.CreateHandler(challengeQuery, codeQuery)
 	app.GET("/graphql", gin.WrapH(gqlHandler))
