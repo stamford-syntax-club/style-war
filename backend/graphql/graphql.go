@@ -28,7 +28,7 @@ func init() {
 	dsn := "host=localhost user=syntax password=stamford dbname=stylewars-dev port=5432 sslmode=disable TimeZone=Asia/Bangkok"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: &SqlLogger{}, // for log SQL Statements
-		DryRun: true,         // "true" for test sql statement (not effect to database)
+		DryRun: false,        // "true" for test sql statement (not effect to database)
 	})
 	if err != nil {
 		panic("failed to connect database: " + err.Error())
