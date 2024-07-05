@@ -1,11 +1,13 @@
 package graphql
 
-import "github.com/graphql-go/graphql"
+import (
+	"github.com/graphql-go/graphql"
+)
 
 type Challenge struct {
 	ID         int      `json:"id"`
 	ImageUrl   string   `json:"imageUrl"`
-	Objectives []string `json:"objectives"`
+	Objectives []string `gorm:"type:text[]" json:"objectives"`
 	IsActive   bool     `json:"isActive"`
 }
 

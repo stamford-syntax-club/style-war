@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres
+    volumes:
+      - ./database:/var/lib/postgresql
+    container_name: stylewars_db
+    environment:
+      POSTGRES_DB: stylewars-dev
+      POSTGRES_USER: syntax
+      POSTGRES_PASSWORD: stamford
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
