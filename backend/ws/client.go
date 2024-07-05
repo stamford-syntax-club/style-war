@@ -4,12 +4,12 @@ import (
 	"log"
 
 	"github.com/gorilla/websocket"
+	"github.com/stamford-syntax-club/style-war/backend/graphql"
 )
 
 type Msg struct {
-	Event   string `json:"event"`
-	Content string `json:"content"`
-	UserId  string `json:"userId"`
+	Event        string `json:"event"`
+	graphql.Code `json:"code"`
 }
 
 type Client struct {
@@ -31,7 +31,7 @@ func (c *Client) ReadMessages() {
 	// ws.SetReadDeadline(time.Now().Add(time.Second * 60))
 
 	for {
-		var msg = &Msg{UserId: c.Id}
+		var msg = &Msg{Code: graphql.Code{UserId: c.Id}}
 		if err := c.Conn.ReadJSON(msg); err != nil {
 			log.Printf("Error reading message from %s: %v", c.Id, err)
 			break

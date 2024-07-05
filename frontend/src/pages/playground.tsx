@@ -34,7 +34,10 @@ export default function Playground() {
     socket.send(
       JSON.stringify({
         event: "code:edit",
-        content: newValue,
+        code: {
+          code: newValue,
+          challengeId: 1, //TODO: get from backend
+        },
       }),
     );
     setValue(newValue);
