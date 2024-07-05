@@ -9,6 +9,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/stamford-syntax-club/style-war/backend/app/challenge"
+	"github.com/stamford-syntax-club/style-war/backend/app/code"
 	"github.com/stamford-syntax-club/style-war/backend/graphql"
 	"github.com/stamford-syntax-club/style-war/backend/websocket"
 )
@@ -43,7 +45,12 @@ func main() {
 	defer cancel()
 	go h.Run(ctx)
 
-	gqlHandler := graphql.CreateHandler()
+	challengeRepo := challenge.NewChallengeRepo()
+	challengeQuery := challenge.NewGqlQuery(challengeRepo)
+	codeRepo := code.NewCodeRepo()
+	codeQuery := code.NewGqlQuery(codeRepo)
+
+	gqlHandler := graphql.CreateHandler(challengeQuery, codeQuery)
 	app.GET("/graphql", gin.WrapH(gqlHandler))
 	app.POST("/graphql", gin.WrapH(gqlHandler))
 

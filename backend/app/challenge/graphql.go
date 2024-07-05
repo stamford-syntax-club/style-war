@@ -25,22 +25,25 @@ var gqlType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-var GqlQuery = &graphql.Field{
-	Type: gqlType,
-	Args: graphql.FieldConfigArgument{
-		"id": &graphql.ArgumentConfig{
-			Type: graphql.Int,
-		},
-	},
-	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-		return Challenge{
-			ID:       1,
-			ImageUrl: "",
-			Objectives: []string{
-				"obj1",
-				"obj2",
+func NewGqlQuery(challengeRepo *ChallengeRepoImpl) *graphql.Field {
+	return &graphql.Field{
+		Type: gqlType,
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.Int,
 			},
-			IsActive: true,
-		}, nil
-	},
+		},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			// return challengeRepo.GetActiveChallenge(), nil
+			return Challenge{
+				ID:       1,
+				ImageUrl: "",
+				Objectives: []string{
+					"obj1",
+					"obj2",
+				},
+				IsActive: true,
+			}, nil
+		},
+	}
 }
