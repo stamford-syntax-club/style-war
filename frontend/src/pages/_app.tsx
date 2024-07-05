@@ -7,6 +7,7 @@ import { dark } from "@clerk/themes";
 import Head from "next/head";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ApplicationShell } from "@/components/core/appshell";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const theme = createTheme({
   colors: {
@@ -25,6 +26,8 @@ const theme = createTheme({
   },
 });
 
+const queryClient = new QueryClient();
+
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
@@ -37,15 +40,17 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
 
       <MantineProvider theme={theme} defaultColorScheme="dark">
-        <ClerkProvider
-          appearance={{
-            baseTheme: dark,
-          }}
-        >
-          <ApplicationShell>
-            <Component {...pageProps} />
-          </ApplicationShell>
-        </ClerkProvider>
+        <QueryClientProvider client={queryClient}>
+          <ClerkProvider
+            appearance={{
+              baseTheme: dark,
+            }}
+          >
+            <ApplicationShell>
+              <Component {...pageProps} />
+            </ApplicationShell>
+          </ClerkProvider>
+        </QueryClientProvider>
       </MantineProvider>
     </>
   );

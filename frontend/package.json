@@ -6,21 +6,27 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "codegen": "graphql-codegen --config codegen.ts",
+    "codegen:watch": "graphql-codegen --config codegen.ts --watch"
   },
   "dependencies": {
     "@clerk/nextjs": "^5.2.1",
     "@clerk/themes": "^2.1.10",
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/introspection": "^4.0.3",
     "@mantine/core": "^7.11.0",
     "@mantine/hooks": "^7.11.0",
     "@monaco-editor/react": "^4.6.0",
+    "@tanstack/react-query": "^5.50.1",
     "monaco-editor": "^0.50.0",
     "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18",
-    "ws": "^4.1.0"
+    "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^5.50.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
