@@ -1,15 +1,10 @@
-package graphql
+package challenge
 
-import "github.com/graphql-go/graphql"
+import (
+	"github.com/graphql-go/graphql"
+)
 
-type Challenge struct {
-	ID         int      `json:"id"`
-	ImageUrl   string   `json:"imageUrl"`
-	Objectives []string `json:"objectives"`
-	IsActive   bool     `json:"isActive"`
-}
-
-var challengeType = graphql.NewObject(graphql.ObjectConfig{
+var gqlType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Challenge",
 	Fields: graphql.Fields{
 		"id": &graphql.Field{
@@ -30,8 +25,8 @@ var challengeType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-var challengeQuery = &graphql.Field{
-	Type: challengeType,
+var GqlQuery = &graphql.Field{
+	Type: gqlType,
 	Args: graphql.FieldConfigArgument{
 		"id": &graphql.ArgumentConfig{
 			Type: graphql.Int,

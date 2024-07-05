@@ -1,4 +1,4 @@
-package ws
+package websocket
 
 import (
 	"context"
@@ -72,7 +72,7 @@ func (h *Hub) Run(ctx context.Context) {
 		case msg := <-h.broadcast:
 			h.handleMessage(msg)
 		case <-ctx.Done():
-			break
+			return
 		}
 	}
 }

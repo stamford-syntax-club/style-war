@@ -1,17 +1,10 @@
-package graphql
+package code
 
 import (
 	"github.com/graphql-go/graphql"
 )
 
-type Code struct {
-	ID          int    `json:"id"`
-	UserId      string `json:"userId"`
-	Code        string `json:"code"`
-	ChallengeId int    `json:"challengeId"`
-}
-
-var codeType = graphql.NewObject(graphql.ObjectConfig{
+var gqlType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Code",
 	Fields: graphql.Fields{
 		"id": &graphql.Field{
@@ -32,8 +25,8 @@ var codeType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-var codeQuery = &graphql.Field{
-	Type: codeType,
+var GqlQuery = &graphql.Field{
+	Type: gqlType,
 	Args: graphql.FieldConfigArgument{
 		"id": &graphql.ArgumentConfig{
 			Type: graphql.Int,

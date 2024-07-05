@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/stamford-syntax-club/style-war/backend/graphql"
-	"github.com/stamford-syntax-club/style-war/backend/ws"
+	"github.com/stamford-syntax-club/style-war/backend/websocket"
 )
 
 func main() {
@@ -37,7 +37,7 @@ func main() {
 	app := gin.Default()
 	app.Use(cors.Default())
 
-	h := ws.NewHub()
+	h := websocket.NewHub()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -49,7 +49,7 @@ func main() {
 
 	app.GET("/ws/:room", jwtAuth.MiddlewareFunc(), func(c *gin.Context) {
 		room := c.Param("room")
-		ws.Serve(c, h, room)
+		websocket.Serve(c, h, room)
 	})
 
 	app.Run(":8080")
