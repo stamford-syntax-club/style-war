@@ -38,25 +38,29 @@ func main() {
 	if err := jwtAuth.MiddlewareInit(); err != nil {
 		log.Fatalf("JWT Middleware initialization failed: %v", err)
 	}
-	challengeRepo := challenge.NewChallengeRepo()
-	challengeQuery := challenge.NewGqlQuery(challengeRepo)
-	codeRepo := code.NewCodeRepo()
-	codeQuery := code.NewGqlQuery(codeRepo)
 
 	app := gin.Default()
 	app.Use(cors.Default())
 
-	h := websocket.NewHub(codeRepo)
-	go h.Run(ctx)
+	// Repositories
+	challengeRepo := challenge.NewChallengeRepo()
+	codeRepo := code.NewCodeRepo()
 
+	// GraphQL Server
+	codeQuery := code.NewGqlQuery(codeRepo)
+	challengeQuery := challenge.NewGqlQuery(challengeRepo)
 	gqlHandler := graphql.CreateHandler(challengeQuery, codeQuery)
 	app.GET("/graphql", gin.WrapH(gqlHandler))
 	app.POST("/graphql", gin.WrapH(gqlHandler))
 
+	// Websocket Server
+	h := websocket.NewHub(codeRepo)
+	go h.Run(ctx)
 	app.GET("/ws/:room", jwtAuth.MiddlewareFunc(), func(c *gin.Context) {
 		room := c.Param("room")
 		websocket.Serve(c, h, room)
 	})
 
+	// TODO: graceful shutdown
 	app.Run(":8080")
 }
