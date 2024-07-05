@@ -3,6 +3,7 @@ import CodeEditor from "@/components/code-editor";
 import Preview from "@/components/preview";
 import { useState } from "react";
 import { useSocket } from "@/lib/websocket/ws";
+import { useCode } from "@/lib/data-hooks/use-code";
 
 export default function Playground() {
   const [value, setValue] = useState(
@@ -17,6 +18,9 @@ export default function Playground() {
   );
 
   const socket = useSocket();
+
+  // NOTE: for now the retrieved data is fixed because db implementation isn't finished yet!
+  const { data: codeData, isLoading, isError } = useCode(5);
 
   const handleChangeValue = (newValue: string | undefined) => {
     if (!newValue) {
@@ -40,6 +44,7 @@ export default function Playground() {
       <Flex justify="center" gap="md" align="center" mt="md">
         <CodeEditor value={value} onChange={handleChangeValue} />
         <Preview value={value} />
+        {codeData?.code?.userId} {codeData?.code?.challengeId}
       </Flex>
     </Container>
   );
