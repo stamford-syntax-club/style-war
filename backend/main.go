@@ -35,7 +35,12 @@ func main() {
 	}
 
 	app := gin.Default()
-	app.Use(cors.Default())
+	corsConf := cors.DefaultConfig()
+	corsConf.AddAllowHeaders("Authorization")
+	corsConf.AllowOriginFunc = func(origin string) bool {
+		return true
+	}
+	app.Use(cors.New(corsConf))
 
 	h := ws.NewHub()
 

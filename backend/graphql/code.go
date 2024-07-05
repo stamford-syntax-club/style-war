@@ -35,16 +35,17 @@ var codeType = graphql.NewObject(graphql.ObjectConfig{
 var codeQuery = &graphql.Field{
 	Type: codeType,
 	Args: graphql.FieldConfigArgument{
-		"id": &graphql.ArgumentConfig{
+		"challengeId": &graphql.ArgumentConfig{
 			Type: graphql.Int,
 		},
 	},
 	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+		challengeId := p.Args["challengeId"].(int)
 		return Code{
 			ID:          1,
 			UserId:      "abc123",
 			Code:        "<html></html>",
-			ChallengeId: 1,
+			ChallengeId: challengeId,
 		}, nil
 	},
 }
