@@ -1,6 +1,8 @@
 package challenge
 
 import (
+	"log"
+
 	"github.com/graphql-go/graphql"
 )
 
@@ -34,7 +36,8 @@ func NewGqlQuery(challengeRepo *ChallengeRepoImpl) *graphql.Field {
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			// return challengeRepo.GetActiveChallenge(), nil
+			// return challengeRepo.GetActiveChallenge()
+			log.Println("context currentUser contains...: ", p.Context.Value("currentUser"))
 			return Challenge{
 				ID:       1,
 				ImageUrl: "",

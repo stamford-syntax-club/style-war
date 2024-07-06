@@ -3,14 +3,13 @@ package main
 import (
 	"context"
 	"log"
-	"os"
 
-	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/stamford-syntax-club/style-war/backend/app/challenge"
 	"github.com/stamford-syntax-club/style-war/backend/app/code"
+	"github.com/stamford-syntax-club/style-war/backend/common"
 	"github.com/stamford-syntax-club/style-war/backend/graphql"
 	"github.com/stamford-syntax-club/style-war/backend/websocket"
 )
@@ -36,9 +35,8 @@ func main() {
 	// GraphQL Server
 	codeQuery := code.NewGqlQuery(codeRepo)
 	challengeQuery := challenge.NewGqlQuery(challengeRepo)
-	gqlHandler := graphql.CreateHandler(challengeQuery, codeQuery)
-	app.GET("/graphql", gin.WrapH(gqlHandler))
-	app.POST("/graphql", gin.WrapH(gqlHandler))
+	app.GET("/graphql", jwtOptionalAuth.MiddlewareFunc(), graphql.CreateHandler(challengeQuery, codeQuery))
+	app.POST("/graphql", jwtOptionalAuth.MiddlewareFunc(), graphql.CreateHandler(challengeQuery, codeQuery))
 
 	// Websocket Server
 	h := websocket.NewHub(codeRepo)
