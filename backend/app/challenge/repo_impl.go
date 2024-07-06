@@ -3,7 +3,7 @@ package challenge
 type ChallengeRepoImpl struct {
 }
 
-func NewChallengeRepo() *ChallengeRepoImpl {
+func NewChallengeRepoImpl() *ChallengeRepoImpl {
 	return &ChallengeRepoImpl{}
 }
 

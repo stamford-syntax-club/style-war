@@ -29,8 +29,8 @@ func main() {
 	app.Use(cors.Default())
 
 	// Repositories
-	challengeRepo := challenge.NewChallengeRepo()
-	codeRepo := code.NewCodeRepo()
+	challengeRepo := challenge.NewChallengeRepoImpl()
+	codeRepo := code.NewCodeRepoImpl()
 
 	// GraphQL Server
 	codeQuery := code.NewGqlQuery(codeRepo)

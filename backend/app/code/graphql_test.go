@@ -9,8 +9,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// It is considered to be of type "CodeRepo" since
+// it contains the methods declared in the CodeRepo interface
+// Mock to avoid actual database connection
+type MockCodeRepo struct{}
+
+func (cr *MockCodeRepo) GetCode() *Code {
+	return &Code{}
+}
+
 func TestCodeQuery(t *testing.T) {
-	codeRepo := NewCodeRepo()
+	codeRepo := &MockCodeRepo{}
 	codeQuery := NewGqlQuery(codeRepo)
 	queryType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",

@@ -27,7 +27,7 @@ var gqlType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-func NewGqlQuery(challengeRepo *ChallengeRepoImpl) *graphql.Field {
+func NewGqlQuery(challengeRepo ChallengeRepo) *graphql.Field {
 	return &graphql.Field{
 		Type: gqlType,
 		Args: graphql.FieldConfigArgument{

@@ -3,7 +3,7 @@ package code
 type CodeRepoImpl struct {
 }
 
-func NewCodeRepo() *CodeRepoImpl {
+func NewCodeRepoImpl() *CodeRepoImpl {
 	return &CodeRepoImpl{}
 }
 
