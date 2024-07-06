@@ -1,10 +1,11 @@
-package ws
+package websocket
 
 import (
 	"context"
 	"log"
 
 	"github.com/gorilla/websocket"
+	"github.com/stamford-syntax-club/style-war/backend/app/code"
 )
 
 type Hub struct {
@@ -13,14 +14,18 @@ type Hub struct {
 	unregister chan *Client
 	broadcast  chan *Msg
 	admin      *websocket.Conn
+
+	codeRepo *code.CodeRepoImpl
 }
 
-func NewHub() *Hub {
+func NewHub(codeRepo *code.CodeRepoImpl) *Hub {
 	return &Hub{
 		clients:    make(map[string]*Client),
 		unregister: make(chan *Client),
 		register:   make(chan *Client),
 		broadcast:  make(chan *Msg),
+		admin:      nil,
+		codeRepo:   codeRepo,
 	}
 }
 
@@ -48,6 +53,7 @@ func (h *Hub) handleMessage(msg *Msg) {
 	if msg.Event == "code:edit" {
 		// TODO: update to db
 		log.Printf("%+v\n", msg)
+		// h.codeRepo
 	}
 
 	// Broadcast to admin
@@ -72,7 +78,7 @@ func (h *Hub) Run(ctx context.Context) {
 		case msg := <-h.broadcast:
 			h.handleMessage(msg)
 		case <-ctx.Done():
-			break
+			return
 		}
 	}
 }
