@@ -23,21 +23,8 @@ func main() {
 		log.Fatalln("error loading environment variable: ", err)
 	}
 
-	jwtAuth := &jwt.GinJWTMiddleware{
-		Realm:       "style-wars",
-		Key:         []byte(os.Getenv("JWT_SECRET")),
-		TokenLookup: "query:token",
-		Unauthorized: func(c *gin.Context, code int, message string) {
-			c.JSON(code, gin.H{
-				"code":    code,
-				"message": message,
-			})
-		},
-		SigningAlgorithm: "HS256",
-	}
-	if err := jwtAuth.MiddlewareInit(); err != nil {
-		log.Fatalf("JWT Middleware initialization failed: %v", err)
-	}
+	jwtOptionalAuth := common.NewOptionalJWTMiddleware()
+	jwtAuth := common.NewJWTMiddleware()
 
 	app := gin.Default()
 	app.Use(cors.Default())
