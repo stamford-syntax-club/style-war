@@ -3,8 +3,10 @@ package websocket
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/stamford-syntax-club/style-war/backend/app/challenge"
 	"github.com/stamford-syntax-club/style-war/backend/app/code"
 )
 
@@ -15,17 +17,25 @@ type Hub struct {
 	broadcast  chan *Msg
 	admin      *websocket.Conn
 
-	codeRepo *code.CodeRepoImpl
+	codeRepo      *code.CodeRepoImpl
+	challengeRepo *challenge.ChallengeRepoImpl
+
+	// NOTE: this map acts as a cache to avoid O(n) database operation
+	// which can bring down our backend during the competition day
+	// only updated when the program starts, and upon receiving "timer:sync" event
+	challengeExpiration map[int]time.Time
 }
 
-func NewHub(codeRepo *code.CodeRepoImpl) *Hub {
+func NewHub(codeRepo *code.CodeRepoImpl, challengeRepo *challenge.ChallengeRepoImpl) *Hub {
 	return &Hub{
-		clients:    make(map[string]*Client),
-		unregister: make(chan *Client),
-		register:   make(chan *Client),
-		broadcast:  make(chan *Msg),
-		admin:      nil,
-		codeRepo:   codeRepo,
+		clients:             make(map[string]*Client),
+		unregister:          make(chan *Client),
+		register:            make(chan *Client),
+		broadcast:           make(chan *Msg),
+		admin:               nil,
+		codeRepo:            codeRepo,
+		challengeRepo:       challengeRepo,
+		challengeExpiration: make(map[int]time.Time),
 	}
 }
 
@@ -49,16 +59,43 @@ func (h *Hub) unregisterClient(client *Client) {
 	}
 }
 
-func (h *Hub) handleMessage(msg *Msg) {
-	if msg.Event == "code:edit" {
-		// TODO: update to db
-		log.Printf("%+v\n", msg)
-		// h.codeRepo
+func (h *Hub) syncChallengeExpiration() {
+	challenges, err := h.challengeRepo.GetAllChallenges("id", "end")
+	if err != nil {
+		log.Println("error retrieving challenges in hub: ", err)
 	}
+	for _, challenge := range challenges {
+		h.challengeExpiration[challenge.ID] = challenge.End
+	}
+}
+
+func (h *Hub) handleCodeSubmission(msg *Msg) {
+	challengeExpiredTime := h.challengeExpiration[msg.Code.ChallengeId]
+	if time.Now().After(challengeExpiredTime) {
+		err := h.clients[msg.Code.UserId].Conn.WriteMessage(websocket.TextMessage, []byte("Time is up!"))
+		if err != nil {
+			log.Println("error writing to client: ", err)
+		}
+		return
+	}
+
+	// TODO: update to db
+	log.Printf("%+v\n", msg)
+	// h.codeRepo
 
 	// Broadcast to admin
 	if h.admin != nil {
 		h.admin.WriteJSON(msg)
+	}
+}
+
+func (h *Hub) handleMessage(msg *Msg) {
+	if msg.Event == "code:edit" {
+		h.handleCodeSubmission(msg)
+	}
+
+	if msg.Event == "timer:sync" {
+		h.syncChallengeExpiration()
 	}
 }
 
@@ -68,6 +105,9 @@ func (h *Hub) Run(ctx context.Context) {
 		close(h.unregister)
 		close(h.broadcast)
 	}()
+
+	// sync expiration from database when the program initially runs
+	h.syncChallengeExpiration()
 
 	for {
 		select {

@@ -60,7 +60,7 @@ func main() {
 	app.POST("/graphql", jwtOptionalAuth.MiddlewareFunc(), graphql.CreateHandler(challengeQuery, codeQuery))
 
 	// Websocket Server
-	h := websocket.NewHub(codeRepo)
+	h := websocket.NewHub(codeRepo, challengeRepo)
 	go h.Run(ctx)
 	app.GET("/ws/:room", jwtAuth.MiddlewareFunc(), func(c *gin.Context) {
 		room := c.Param("room")
