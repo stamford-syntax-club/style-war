@@ -53,7 +53,6 @@ func (suite *HubTestSuite) TestRegisterClient() {
 		suite.hub.register <- client2
 
 		<-ticker.C
-
 		suite.hub.mutex.Lock()
 		defer suite.hub.mutex.Unlock()
 		suite.Equal(2, len(suite.hub.clients))
@@ -70,10 +69,43 @@ func (suite *HubTestSuite) TestRegisterClient() {
 		suite.hub.register <- clientAgain
 
 		<-ticker.C
-
 		suite.hub.mutex.Lock()
 		defer suite.hub.mutex.Unlock()
 		suite.Equal(1, len(suite.hub.clients))
 		suite.Equal(client, suite.hub.clients[client.Id])
+	})
+}
+
+func (suite *HubTestSuite) TestUnregisterClient() {
+	client := &Client{Id: "test-1", Conn: nil, hub: suite.hub}
+	client2 := &Client{Id: "test-2", Conn: nil, hub: suite.hub}
+	suite.Run("client is unregistered from hub when disconnect", func() {
+		ticker := time.NewTicker(time.Second)
+		suite.hub.clients = map[string]*Client{client.Id: client, client2.Id: client2}
+
+		suite.hub.unregister <- client
+
+		<-ticker.C
+		suite.hub.mutex.Lock()
+		defer suite.hub.mutex.Unlock()
+		suite.Equal(1, len(suite.hub.clients))
+		suite.Nil(suite.hub.clients[client.Id])     // client 1 is removed successfully
+		suite.NotNil(suite.hub.clients[client2.Id]) // client 2 stays
+	})
+
+	suite.Run("tolerate unregistering user who never connected before", func() {
+		ticker := time.NewTicker(time.Second)
+		client3 := &Client{Id: "test-3", Conn: nil, hub: suite.hub} // this guy is not in hub.clients
+		suite.hub.clients = map[string]*Client{client.Id: client, client2.Id: client2}
+
+		suite.hub.unregister <- client3
+
+		<-ticker.C
+
+		suite.hub.mutex.Lock()
+		defer suite.hub.mutex.Unlock()
+		suite.Equal(2, len(suite.hub.clients))
+		suite.NotNil(suite.hub.clients[client.Id])  // client 1 stays
+		suite.NotNil(suite.hub.clients[client2.Id]) // client 2 stays
 	})
 }
