@@ -3,6 +3,7 @@ package websocket
 import (
 	"context"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -17,8 +18,10 @@ type Hub struct {
 	broadcast  chan *Msg
 	admin      *websocket.Conn
 
-	codeRepo      *code.CodeRepoImpl
-	challengeRepo *challenge.ChallengeRepoImpl
+	mutex sync.Mutex
+
+	codeRepo      code.CodeRepo
+	challengeRepo challenge.ChallengeRepo
 
 	// NOTE: this map acts as a cache to avoid O(n) database operation
 	// which can bring down our backend during the competition day
@@ -26,7 +29,7 @@ type Hub struct {
 	challengeExpiration map[int]time.Time
 }
 
-func NewHub(codeRepo *code.CodeRepoImpl, challengeRepo *challenge.ChallengeRepoImpl) *Hub {
+func NewHub(codeRepo code.CodeRepo, challengeRepo challenge.ChallengeRepo) *Hub {
 	return &Hub{
 		clients:             make(map[string]*Client),
 		unregister:          make(chan *Client),
@@ -40,7 +43,8 @@ func NewHub(codeRepo *code.CodeRepoImpl, challengeRepo *challenge.ChallengeRepoI
 }
 
 func (h *Hub) registerClient(client *Client) {
-	// TODO: mutex lock
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
 
 	if _, ok := h.clients[client.Id]; ok {
 		log.Println("connection refresh, id: ", client.Id)
@@ -52,7 +56,9 @@ func (h *Hub) registerClient(client *Client) {
 }
 
 func (h *Hub) unregisterClient(client *Client) {
-	// TODO: mutex lock
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
+
 	if _, ok := h.clients[client.Id]; ok {
 		log.Println("client unregistered, id: ", client.Id)
 		delete(h.clients, client.Id)
