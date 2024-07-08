@@ -70,13 +70,18 @@ func (h *Hub) syncChallengeExpiration() {
 	if err != nil {
 		log.Println("error retrieving challenges in hub: ", err)
 	}
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
 	for _, challenge := range challenges {
 		h.challengeExpiration[challenge.ID] = challenge.End
 	}
 }
 
 func (h *Hub) handleCodeSubmission(msg *Msg) {
+	h.mutex.Lock()
 	challengeExpiredTime := h.challengeExpiration[msg.Code.ChallengeId]
+	h.mutex.Unlock()
+
 	if time.Now().After(challengeExpiredTime) {
 		err := h.clients[msg.Code.UserId].Conn.WriteMessage(websocket.TextMessage, []byte("Time is up!"))
 		if err != nil {

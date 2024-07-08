@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"context"
+	"sync"
 	"testing"
 	"time"
 
@@ -16,6 +17,7 @@ type HubTestSuite struct {
 	ctxCancel context.CancelFunc
 	hub       *Hub
 	suite.Suite
+	mutex sync.Mutex
 }
 
 func TestHubSuite(t *testing.T) {
@@ -51,6 +53,9 @@ func (suite *HubTestSuite) TestRegisterClient() {
 		suite.hub.register <- client2
 
 		<-ticker.C
+
+		suite.hub.mutex.Lock()
+		defer suite.hub.mutex.Unlock()
 		suite.Equal(2, len(suite.hub.clients))
 		suite.Equal(client, suite.hub.clients[client.Id])
 		suite.Equal(client2, suite.hub.clients[client2.Id])
@@ -65,6 +70,9 @@ func (suite *HubTestSuite) TestRegisterClient() {
 		suite.hub.register <- clientAgain
 
 		<-ticker.C
+
+		suite.hub.mutex.Lock()
+		defer suite.hub.mutex.Unlock()
 		suite.Equal(1, len(suite.hub.clients))
 		suite.Equal(client, suite.hub.clients[client.Id])
 	})
