@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"testing"
 	"time"
@@ -15,8 +16,13 @@ import (
 type HubTestSuite struct {
 	ctx       context.Context
 	ctxCancel context.CancelFunc
-	hub       *Hub
+
+	hub           *Hub
+	codeRepo      *code_mock.CodeRepo
+	challengeRepo *challenge_mock.ChallengeRepo
+
 	suite.Suite
+
 	mutex sync.Mutex
 }
 
@@ -24,17 +30,23 @@ func TestHubSuite(t *testing.T) {
 	suite.Run(t, new(HubTestSuite))
 }
 
+var endDate, _ = time.Parse("yyyy-mm-dd", "2024-07-09")
+
 // setup dependecies before running each test
 func (suite *HubTestSuite) SetupSubTest() {
-	challengeRepo := challenge_mock.NewChallengeRepo(suite.Suite.T())
-	codeRepo := code_mock.NewCodeRepo(suite.Suite.T())
-	challengeRepo.On("GetAllChallenges", "id", "end").Return([]challenge.Challenge{
+	suite.challengeRepo = challenge_mock.NewChallengeRepo(suite.Suite.T())
+	suite.codeRepo = code_mock.NewCodeRepo(suite.Suite.T())
+	suite.challengeRepo.On("GetAllChallenges", "id", "end").Return([]challenge.Challenge{
 		{
 			ID:  1,
-			End: time.Now().Add(time.Minute),
+			End: endDate,
+		},
+		{
+			ID:  2,
+			End: endDate,
 		},
 	}, nil)
-	suite.hub = NewHub(codeRepo, challengeRepo)
+	suite.hub = NewHub(suite.codeRepo, suite.challengeRepo)
 	suite.ctx, suite.ctxCancel = context.WithTimeout(context.Background(), 2*time.Second)
 	go suite.hub.Run(suite.ctx)
 }
@@ -108,4 +120,35 @@ func (suite *HubTestSuite) TestUnregisterClient() {
 		suite.NotNil(suite.hub.clients[client.Id])  // client 1 stays
 		suite.NotNil(suite.hub.clients[client2.Id]) // client 2 stays
 	})
+}
+
+func (suite *HubTestSuite) TestSyncChallengeExpiration() {
+	suite.Run("set end date correctly", func() {
+		ticker := time.NewTicker(time.Second)
+		testHub := NewHub(suite.codeRepo, suite.challengeRepo)
+
+		testHub.syncChallengeExpiration()
+
+		<-ticker.C
+		suite.Equal(testHub.challengeExpiration[0], endDate)
+		suite.Equal(testHub.challengeExpiration[1], endDate)
+	})
+
+	suite.Run("empty expiration map if error when getting active challenges", func() {
+		ticker := time.NewTicker(time.Second)
+		mockChallRepo := challenge_mock.NewChallengeRepo(suite.T())
+		mockChallRepo.On("GetAllChallenges", "id", "end").Return(nil, errors.New("test error"))
+		testHub := NewHub(suite.codeRepo, mockChallRepo)
+
+		testHub.syncChallengeExpiration()
+
+		<-ticker.C
+		suite.Empty(testHub.challengeExpiration)
+	})
+}
+
+func (suite *HubTestSuite) TestHandleCodeSubmission() {
+}
+
+func (suite *HubTestSuite) TestHandleMessage() {
 }
