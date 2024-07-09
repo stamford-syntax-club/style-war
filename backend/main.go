@@ -7,6 +7,10 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+
 	"github.com/stamford-syntax-club/style-war/backend/app/challenge"
 	"github.com/stamford-syntax-club/style-war/backend/app/code"
 	"github.com/stamford-syntax-club/style-war/backend/common"
@@ -33,9 +37,22 @@ func main() {
 	}
 	app.Use(cors.New(corsConf))
 
+	// Database
+	dsn := "host=localhost user=syntax password=stamford dbname=stylewars-dev port=5432 sslmode=disable TimeZone=Asia/Bangkok"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+		DryRun: false, // "true" for test sql statement (not effect to database)
+	})
+	if err != nil {
+		log.Fatalln("failed to connect database: " + err.Error())
+	}
+
+	db.AutoMigrate(challenge.Challenge{})
+	db.AutoMigrate(code.Code{})
+
 	// Repositories
-	challengeRepo := challenge.NewChallengeRepoImpl()
-	codeRepo := code.NewCodeRepoImpl()
+	challengeRepo := challenge.NewChallengeRepoImpl(db)
+	codeRepo := code.NewCodeRepoImpl(db)
 
 	// GraphQL Server
 	codeQuery := code.NewGqlQuery(codeRepo)

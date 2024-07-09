@@ -9,5 +9,5 @@ type Code struct {
 
 // Any struct with the following method is considered to be CodeRepo
 type CodeRepo interface {
-	GetCode() *Code
+	GetCode(int, string) (*Code, error)
 }

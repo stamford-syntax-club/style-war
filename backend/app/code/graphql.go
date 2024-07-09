@@ -29,17 +29,14 @@ func NewGqlQuery(codeRepo CodeRepo) *graphql.Field {
 	return &graphql.Field{
 		Type: gqlType,
 		Args: graphql.FieldConfigArgument{
-			"id": &graphql.ArgumentConfig{
+			"challenge_id": &graphql.ArgumentConfig{
 				Type: graphql.Int,
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			return Code{
-				ID:          1,
-				UserId:      "abc123",
-				Code:        "<html></html>",
-				ChallengeId: 1,
-			}, nil
+			challengeId := p.Args["challenge_id"].(int)
+			userId := p.Context.Value("currentUser").(string)
+			return codeRepo.GetCode(challengeId, userId)
 		},
 	}
 }
