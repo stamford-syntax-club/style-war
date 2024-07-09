@@ -16,9 +16,6 @@ import (
 	"github.com/stamford-syntax-club/style-war/backend/common"
 	"github.com/stamford-syntax-club/style-war/backend/graphql"
 	"github.com/stamford-syntax-club/style-war/backend/websocket"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 func main() {

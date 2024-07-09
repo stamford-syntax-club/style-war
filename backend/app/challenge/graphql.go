@@ -45,7 +45,6 @@ func newGqlQueries(challengeRepo ChallengeRepo) graphql.Fields {
 			},
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			log.Println("context currentUser contains...: ", p.Context.Value("currentUser"))
 			return challengeRepo.GetActiveChallenge()
 		},
 	}

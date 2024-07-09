@@ -83,6 +83,7 @@ func (h *Hub) handleCodeSubmission(msg *Msg) {
 	h.mutex.Unlock()
 
 	if time.Now().After(challengeExpiredTime) {
+		log.Printf("submission for challenge: %d is expired", msg.Code.ChallengeId)
 		err := h.clients[msg.Code.UserId].Conn.WriteMessage(websocket.TextMessage, []byte("Time is up!"))
 		if err != nil {
 			log.Println("error writing to client: ", err)
@@ -91,7 +92,7 @@ func (h *Hub) handleCodeSubmission(msg *Msg) {
 	}
 
 	// TODO: update to db
-	log.Printf("%+v\n", msg)
+	log.Printf("%+v\n", msg.Code)
 	// h.codeRepo
 
 	// Broadcast to admin

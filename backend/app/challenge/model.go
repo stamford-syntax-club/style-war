@@ -17,6 +17,6 @@ type Challenge struct {
 
 // Any struct with the following method is considered to be ChallengeRepo
 type ChallengeRepo interface {
-	GetActiveChallenge() *Challenge
+	GetActiveChallenge() (*Challenge, error)
 	GetAllChallenges(...string) ([]Challenge, error)
 }

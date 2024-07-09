@@ -13,7 +13,7 @@ type ChallengeRepo struct {
 }
 
 // GetActiveChallenge provides a mock function with given fields:
-func (_m *ChallengeRepo) GetActiveChallenge() *challenge.Challenge {
+func (_m *ChallengeRepo) GetActiveChallenge() (*challenge.Challenge, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
@@ -21,6 +21,10 @@ func (_m *ChallengeRepo) GetActiveChallenge() *challenge.Challenge {
 	}
 
 	var r0 *challenge.Challenge
+	var r1 error
+	if rf, ok := ret.Get(0).(func() (*challenge.Challenge, error)); ok {
+		return rf()
+	}
 	if rf, ok := ret.Get(0).(func() *challenge.Challenge); ok {
 		r0 = rf()
 	} else {
@@ -29,7 +33,13 @@ func (_m *ChallengeRepo) GetActiveChallenge() *challenge.Challenge {
 		}
 	}
 
-	return r0
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // GetAllChallenges provides a mock function with given fields: _a0
