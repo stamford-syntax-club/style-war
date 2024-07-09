@@ -17,3 +17,16 @@ func (chr *ChallengeRepoImpl) GetActiveChallenge() (*Challenge, error) {
 	result := chr.db.First(&challenge, "is_active = true")
 	return &challenge, result.Error
 }
+
+func (chr *ChallengeRepoImpl) GetAllChallenges(fields ...string) ([]Challenge, error) {
+	if len(fields) < 1 {
+		fields = []string{"*"}
+	}
+
+	var challenges []Challenge
+	if result := chr.db.Select(fields).Find(&challenges); result.Error != nil {
+		return nil, result.Error
+	}
+
+	return challenges, nil
+}

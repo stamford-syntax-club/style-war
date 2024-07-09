@@ -36,6 +36,12 @@ func Serve(c *gin.Context, h *Hub, room string) {
 
 	if room == "admin" {
 		log.Println("admin has connected")
+
 		h.admin = conn
+
+		client := NewClient("admin", conn, h)
+
+		// for reading "timer:sync" event
+		go client.ReadMessages()
 	}
 }

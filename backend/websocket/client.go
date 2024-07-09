@@ -4,12 +4,14 @@ import (
 	"log"
 
 	"github.com/gorilla/websocket"
+	"github.com/stamford-syntax-club/style-war/backend/app/challenge"
 	"github.com/stamford-syntax-club/style-war/backend/app/code"
 )
 
 type Msg struct {
-	Event     string `json:"event"`
-	code.Code `json:"code"`
+	Event     string               `json:"event"`
+	Code      *code.Code           `json:"code"`
+	Challenge *challenge.Challenge `json:"challenge"`
 }
 
 type Client struct {
@@ -31,7 +33,7 @@ func (c *Client) ReadMessages() {
 	// ws.SetReadDeadline(time.Now().Add(time.Second * 60))
 
 	for {
-		var msg = &Msg{Code: code.Code{UserId: c.Id}}
+		var msg = &Msg{Code: &code.Code{UserId: c.Id}}
 		if err := c.Conn.ReadJSON(msg); err != nil {
 			log.Printf("Error reading message from %s: %v", c.Id, err)
 			break

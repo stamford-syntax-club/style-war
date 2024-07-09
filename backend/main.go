@@ -16,6 +16,9 @@ import (
 	"github.com/stamford-syntax-club/style-war/backend/common"
 	"github.com/stamford-syntax-club/style-war/backend/graphql"
 	"github.com/stamford-syntax-club/style-war/backend/websocket"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func main() {
@@ -62,7 +65,7 @@ func main() {
 	app.POST("/graphql", jwtOptionalAuth.MiddlewareFunc(), gqlHandler)
 
 	// Websocket Server
-	h := websocket.NewHub(codeRepo)
+	h := websocket.NewHub(codeRepo, challengeRepo)
 	go h.Run(ctx)
 	app.GET("/ws/:room", jwtAuth.MiddlewareFunc(), func(c *gin.Context) {
 		room := c.Param("room")
