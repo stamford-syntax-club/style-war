@@ -55,10 +55,11 @@ func main() {
 	codeRepo := code.NewCodeRepoImpl(db)
 
 	// GraphQL Server
-	codeQuery := code.NewGqlQuery(codeRepo)
-	challengeQuery := challenge.NewGqlQuery(challengeRepo)
-	app.GET("/graphql", jwtOptionalAuth.MiddlewareFunc(), graphql.CreateHandler(challengeQuery, codeQuery))
-	app.POST("/graphql", jwtOptionalAuth.MiddlewareFunc(), graphql.CreateHandler(challengeQuery, codeQuery))
+	codeGql := code.NewGraphQL(codeRepo)
+	challengeGql := challenge.NewGraphQL(challengeRepo)
+	gqlHandler := graphql.CreateHandler(challengeGql, codeGql)
+	app.GET("/graphql", jwtOptionalAuth.MiddlewareFunc(), gqlHandler)
+	app.POST("/graphql", jwtOptionalAuth.MiddlewareFunc(), gqlHandler)
 
 	// Websocket Server
 	h := websocket.NewHub(codeRepo)

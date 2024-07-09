@@ -8,22 +8,42 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
+	"github.com/stamford-syntax-club/style-war/backend/app/challenge"
+	"github.com/stamford-syntax-club/style-war/backend/app/code"
 	"github.com/stamford-syntax-club/style-war/backend/common"
 )
 
-func registerQueries(challengeQuery *graphql.Field, codeQuery *graphql.Field) *graphql.Object {
+// Helper function to merge multiple graphql.Fields into one
+func mergeFields(fields ...graphql.Fields) graphql.Fields {
+	merged := graphql.Fields{}
+	for _, field := range fields {
+		for key, value := range field {
+			merged[key] = value
+		}
+	}
+	return merged
+}
+
+func registerQueries(queries ...graphql.Fields) *graphql.Object {
 	return graphql.NewObject(graphql.ObjectConfig{
-		Name: "Query",
-		Fields: graphql.Fields{
-			"challenge": challengeQuery,
-			"code":      codeQuery,
-		},
+		Name:   "Query",
+		Fields: mergeFields(queries...),
 	})
 }
 
-func CreateHandler(challengeQuery *graphql.Field, codeQuery *graphql.Field) gin.HandlerFunc {
+func registerMutations(mutations ...graphql.Fields) *graphql.Object {
+	mutationObj := graphql.NewObject(graphql.ObjectConfig{
+		Name:   "Mutation",
+		Fields: mergeFields(mutations...),
+	})
+
+	return mutationObj
+}
+
+func CreateHandler(challengeGraphQL *challenge.GraphQL, codeGraphQL *code.GraphQL) gin.HandlerFunc {
 	schema, err := graphql.NewSchema(graphql.SchemaConfig{
-		Query: registerQueries(challengeQuery, codeQuery),
+		Query:    registerQueries(challengeGraphQL.Queries, codeGraphQL.Queries),
+		Mutation: registerMutations(challengeGraphQL.Mutations, codeGraphQL.Mutations),
 	})
 	if err != nil {
 		log.Fatalf("An error has occured while pasrsing GrahpQL schema: %s", err)

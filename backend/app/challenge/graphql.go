@@ -6,6 +6,15 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
+type GraphQL struct {
+	Queries   graphql.Fields
+	Mutations graphql.Fields
+}
+
+func NewGraphQL(challengeRepo ChallengeRepo) *GraphQL {
+	return &GraphQL{Queries: newGqlQueries(challengeRepo), Mutations: newGqlMutations(challengeRepo)}
+}
+
 var gqlType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Challenge",
 	Fields: graphql.Fields{
@@ -27,8 +36,8 @@ var gqlType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-func NewGqlQuery(challengeRepo ChallengeRepo) *graphql.Field {
-	return &graphql.Field{
+func newGqlQueries(challengeRepo ChallengeRepo) graphql.Fields {
+	challengeQuery := &graphql.Field{
 		Type: gqlType,
 		Args: graphql.FieldConfigArgument{
 			"id": &graphql.ArgumentConfig{
@@ -40,4 +49,31 @@ func NewGqlQuery(challengeRepo ChallengeRepo) *graphql.Field {
 			return challengeRepo.GetActiveChallenge()
 		},
 	}
+
+	queries := map[string]*graphql.Field{
+		"challenge": challengeQuery,
+	}
+
+	return queries
+}
+
+func newGqlMutations(challengeRepo ChallengeRepo) graphql.Fields {
+	setActiveChallengeMutation := &graphql.Field{
+		Type: gqlType,
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+		},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			log.Println("SetActiveChallenge is called")
+			return nil, nil
+		},
+	}
+
+	mutations := map[string]*graphql.Field{
+		"setActiveChallenge": setActiveChallengeMutation,
+	}
+
+	return mutations
 }
