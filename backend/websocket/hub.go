@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -93,6 +94,11 @@ func (h *Hub) handleCodeSubmission(msg *Msg) {
 
 	// TODO: update to db
 	log.Printf("%+v\n", msg.Code)
+	h.clients[msg.Code.UserId].Conn.WriteMessage(
+		websocket.TextMessage,
+		[]byte(fmt.Sprintf("Submission from %s for challenge %d received!",
+			msg.Code.UserId,
+			msg.Code.ChallengeId)))
 	// h.codeRepo
 
 	// Broadcast to admin

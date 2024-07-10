@@ -3,12 +3,17 @@ package websocket
 import (
 	"context"
 	"errors"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/stamford-syntax-club/style-war/backend/app/challenge"
 	challenge_mock "github.com/stamford-syntax-club/style-war/backend/app/challenge/mocks"
+	"github.com/stamford-syntax-club/style-war/backend/app/code"
 	code_mock "github.com/stamford-syntax-club/style-war/backend/app/code/mocks"
 	"github.com/stretchr/testify/suite"
 )
@@ -147,8 +152,66 @@ func (suite *HubTestSuite) TestSyncChallengeExpiration() {
 	})
 }
 
-func (suite *HubTestSuite) TestHandleCodeSubmission() {
-}
+//	func (suite *HubTestSuite) TestHandleCodeSubmission() {
+//		client := &Client{Id: "test-1", Conn: nil, hub: suite.hub}
+//		admin := &Client{Id: "admin", Conn: nil, hub: suite.hub}
+//
+//		h := NewHub()
+//	}
 
-func (suite *HubTestSuite) TestHandleMessage() {
+func (suite *HubTestSuite) TestHandleCodeSubmission() {
+	// timer := time.NewTicker(time.Second)
+	testHub := NewHub(suite.codeRepo, suite.challengeRepo)
+
+	tests := []struct {
+		name             string
+		msg              *Msg
+		expectedResponse string
+		shouldBeExpired  bool
+	}{
+		{
+			name:             "acknowledge submission if not pass submission deadline",
+			msg:              &Msg{Event: "code:edit", Code: &code.Code{UserId: "test-good-khing", Code: "hi", ChallengeId: 1234}},
+			expectedResponse: "Submission from test-good-khing for challenge 1234 received!",
+		},
+		{
+			name:             "reject submission if exceed submission deadline",
+			msg:              &Msg{Event: "code:edit", Code: &code.Code{UserId: "test-good-khing", Code: "hi", ChallengeId: 1234}},
+			expectedResponse: "Time is up!",
+			shouldBeExpired:  true,
+		},
+	}
+
+	for _, test := range tests {
+		suite.Run(test.name, func() {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				upgrader := websocket.Upgrader{}
+				conn, err := upgrader.Upgrade(w, r, nil)
+				suite.NoError(err)
+				defer conn.Close()
+				for {
+					_, message, _ := conn.ReadMessage()
+
+					suite.Equal(test.expectedResponse, string(message))
+				}
+			}))
+			defer server.Close()
+
+			url, err := url.Parse(server.URL)
+			suite.NoError(err)
+			url.Scheme = "ws"
+			conn, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
+			client := NewClient(test.msg.Code.UserId, conn, testHub)
+			testHub.registerClient(client)
+			testHub.mutex.Lock()
+			if test.shouldBeExpired {
+				testHub.challengeExpiration[test.msg.Code.ChallengeId] = endDate
+			} else {
+				testHub.challengeExpiration[test.msg.Code.ChallengeId] = time.Now().Add(time.Hour)
+			}
+			testHub.mutex.Unlock()
+
+			testHub.handleCodeSubmission(test.msg)
+		})
+	}
 }
