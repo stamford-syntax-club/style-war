@@ -1,10 +1,33 @@
-import { Container, Text } from "@mantine/core";
+import { useSetActiveChallenge } from "@/lib/data-hooks/use-set-challenge";
+import { useSocket } from "@/lib/websocket/ws";
+import { Button, Container, Text } from "@mantine/core";
+import { useEffect, useState } from "react";
 
 const teams = new Array(6).fill("Team");
 
 function AdminPage() {
+  const socket = useSocket("admin");
+
+  const [remainingTime, setRemainingTime] = useState(0);
+  const { mutate } = useSetActiveChallenge();
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.onmessage = function (ev) {
+      console.log(JSON.parse(ev.data).RemainingTime);
+      setRemainingTime(JSON.parse(ev.data).RemainingTime);
+    };
+  }, [socket]);
+
   return (
     <Container fluid>
+      <Button
+        onClick={() => {
+          mutate({ id: 1, duration: 2 });
+        }}
+      >
+        Start!
+      </Button>
       <Text
         ta="center"
         style={{ fontSize: "26px" }}
@@ -26,7 +49,7 @@ function AdminPage() {
         </div>
         <div className="w-1/5 justify-center content-center">
           <div className="text-center text-4xl font-bold p-4">TIMER</div>
-          <div className="text-center text-2xl">99:99</div>
+          <div className="text-center text-2xl">{remainingTime}</div>
         </div>
       </div>
     </Container>

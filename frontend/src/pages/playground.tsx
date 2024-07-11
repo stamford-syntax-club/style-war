@@ -6,6 +6,8 @@ import { useSocket } from "@/lib/websocket/ws";
 import { useCode } from "@/lib/data-hooks/use-code";
 
 export default function Playground() {
+  // NOTE: for now the retrieved data is fixed because db implementation isn't finished yet!
+  const { data: codeData, isLoading, isError } = useCode(1);
   const [value, setValue] = useState(
     `<!DOCTYPE html>
 <html>
@@ -18,9 +20,6 @@ export default function Playground() {
   );
 
   const socket = useSocket();
-
-  // NOTE: for now the retrieved data is fixed because db implementation isn't finished yet!
-  const { data: codeData, isLoading, isError } = useCode(5);
 
   const handleChangeValue = (newValue: string | undefined) => {
     if (!newValue) {
