@@ -42,7 +42,7 @@ export default function Playground() {
   return (
     <Container fluid>
       <Flex justify="center" gap="md" align="center" mt="md">
-        <CodeEditor value={value} onChange={handleChangeValue} timeDuration={10} />
+        <CodeEditor value={value} onChange={handleChangeValue} />
         <Preview value={value} />
         {codeData?.code?.userId} {codeData?.code?.challengeId}
       </Flex>
