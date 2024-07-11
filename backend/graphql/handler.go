@@ -66,11 +66,16 @@ func CreateHandler(challengeGraphQL *challenge.GraphQL, codeGraphQL *code.GraphQ
 				c.AbortWithError(http.StatusBadRequest, err)
 			}
 
-			result := graphql.Do(graphql.Params{
+			params := graphql.Params{
 				Schema:        schema,
 				RequestString: payload["query"].(string),
 				Context:       context.WithValue(context.Background(), "currentUser", userId),
-			})
+			}
+			if variables, ok := payload["variables"].(map[string]interface{}); ok {
+				params.VariableValues = variables
+			}
+
+			result := graphql.Do(params)
 			if len(result.Errors) > 0 {
 				log.Printf("wrong result, unexpected errors: %v", result.Errors)
 				c.AbortWithError(http.StatusBadRequest, result.Errors[0])
