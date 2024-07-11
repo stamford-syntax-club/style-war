@@ -2,6 +2,7 @@ package challenge
 
 import (
 	"log"
+	"time"
 
 	"github.com/graphql-go/graphql"
 )
@@ -11,8 +12,8 @@ type GraphQL struct {
 	Mutations graphql.Fields
 }
 
-func NewGraphQL(challengeRepo ChallengeRepo) *GraphQL {
-	return &GraphQL{Queries: newGqlQueries(challengeRepo), Mutations: newGqlMutations(challengeRepo)}
+func NewGraphQL(challengeRepo ChallengeRepo, timerCh chan Challenge) *GraphQL {
+	return &GraphQL{Queries: newGqlQueries(challengeRepo), Mutations: newGqlMutations(challengeRepo, timerCh)}
 }
 
 var gqlType = graphql.NewObject(graphql.ObjectConfig{
@@ -56,16 +57,19 @@ func newGqlQueries(challengeRepo ChallengeRepo) graphql.Fields {
 	return queries
 }
 
-func newGqlMutations(challengeRepo ChallengeRepo) graphql.Fields {
+func newGqlMutations(challengeRepo ChallengeRepo, timerCh chan Challenge) graphql.Fields {
 	setActiveChallengeMutation := &graphql.Field{
 		Type: gqlType,
 		Args: graphql.FieldConfigArgument{
 			"id": &graphql.ArgumentConfig{
 				Type: graphql.Int,
 			},
+			// duration in minutes
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			log.Println("SetActiveChallenge is called")
+			// set start time here
+			timerCh <- Challenge{ID: 1, StartTime: time.Now(), Duration: 1}
 			return nil, nil
 		},
 	}

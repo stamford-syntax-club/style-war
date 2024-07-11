@@ -17,6 +17,8 @@ type Hub struct {
 	register   chan *Client
 	unregister chan *Client
 	broadcast  chan *Msg
+	timer      *time.Timer
+	timerCh    chan challenge.Challenge
 	admin      *websocket.Conn
 
 	mutex sync.Mutex
@@ -30,12 +32,13 @@ type Hub struct {
 	challengeExpiration map[int]time.Time
 }
 
-func NewHub(codeRepo code.CodeRepo, challengeRepo challenge.ChallengeRepo) *Hub {
+func NewHub(codeRepo code.CodeRepo, challengeRepo challenge.ChallengeRepo, timerCh chan challenge.Challenge) *Hub {
 	return &Hub{
 		clients:             make(map[string]*Client),
 		unregister:          make(chan *Client),
 		register:            make(chan *Client),
 		broadcast:           make(chan *Msg),
+		timerCh:             timerCh,
 		admin:               nil,
 		codeRepo:            codeRepo,
 		challengeRepo:       challengeRepo,
@@ -66,21 +69,65 @@ func (h *Hub) unregisterClient(client *Client) {
 	}
 }
 
-func (h *Hub) syncChallengeExpiration() {
-	challenges, err := h.challengeRepo.GetAllChallenges("id", "end")
-	if err != nil {
-		log.Println("error retrieving challenges in hub: ", err)
-	}
+func (h *Hub) syncChallengeExpiration(challenge challenge.Challenge) {
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
-	for _, challenge := range challenges {
-		h.challengeExpiration[challenge.ID] = challenge.End
-	}
 
-	if h.admin != nil {
-		if err := h.admin.WriteJSON(h.challengeExpiration); err != nil {
-			log.Println("error writing updated expiration to admin: ", err)
-		}
+	// setup end time
+	endDuration := challenge.Duration * time.Minute
+	h.challengeExpiration[challenge.ID] = challenge.StartTime.Add(endDuration)
+
+	if h.timer == nil {
+		h.timer = time.AfterFunc(endDuration, func() {
+			log.Println("TIMES UP!!")
+			h.timer = nil
+			// msg := Msg{Event: "timer:status", RemainingTime: 0}
+			// // send update to admin
+			// if h.admin != nil {
+			// 	if err := h.admin.WriteJSON(msg); err != nil {
+			// 		log.Println("error writing updated expiration to admin: ", err)
+			// 	}
+			// }
+			//
+			// // send update to clients
+			// for userId, client := range h.clients {
+			// 	if err := client.WriteJSON(msg); err != nil {
+			// 		log.Printf("error writing updated expiration to %s due to: %v\n", userId, err)
+			// 	}
+			// }
+		})
+		go func() {
+			ticker := time.NewTicker(time.Second)
+			defer ticker.Stop()
+
+			for range ticker.C {
+				elapsed := time.Since(challenge.StartTime)
+				remaining := endDuration - elapsed
+
+				// stop this func if exceeds endDuration
+				if remaining <= 0 {
+					break
+				}
+
+				log.Println("remaining time: ", remaining.Seconds())
+
+				msg := Msg{Event: "timer:status", RemainingTime: time.Duration(remaining.Seconds())}
+				// send update to admin
+				if h.admin != nil {
+					if err := h.admin.WriteJSON(msg); err != nil {
+						log.Println("error writing updated expiration to admin: ", err)
+					}
+				}
+
+				// send update to clients
+				for userId, client := range h.clients {
+					if err := client.WriteJSON(msg); err != nil {
+						log.Printf("error writing updated expiration to %s due to: %v\n", userId, err)
+					}
+				}
+			}
+		}()
+
 	}
 }
 
@@ -117,10 +164,6 @@ func (h *Hub) handleMessage(msg *Msg) {
 	if msg.Event == "code:edit" {
 		h.handleCodeSubmission(msg)
 	}
-
-	if msg.Event == "timer:sync" {
-		h.syncChallengeExpiration()
-	}
 }
 
 func (h *Hub) Run(ctx context.Context) {
@@ -130,9 +173,6 @@ func (h *Hub) Run(ctx context.Context) {
 		close(h.broadcast)
 	}()
 
-	// sync expiration from database when the program initially runs
-	h.syncChallengeExpiration()
-
 	for {
 		select {
 		case client := <-h.register:
@@ -141,6 +181,8 @@ func (h *Hub) Run(ctx context.Context) {
 			h.unregisterClient(client)
 		case msg := <-h.broadcast:
 			h.handleMessage(msg)
+		case challenge := <-h.timerCh:
+			h.syncChallengeExpiration(challenge)
 		case <-ctx.Done():
 			return
 		}
