@@ -37,7 +37,7 @@ export default function CodeEditor({
   const handleStart = () => {
     setIsEditorEnabled(true);
     setIsTimeLeft(timeDuration || 0);
-  }
+  };
 
   const timeFormatter = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -59,7 +59,11 @@ export default function CodeEditor({
             color={isEditorEnabled ? "yellow" : "green"}
             mr="md"
           >
-            {isEditorEnabled ? "Cooking" : "Start"}
+            {isTimeLeft === 0
+              ? "Cooked"
+              : isEditorEnabled
+              ? "Cooking"
+              : "Start"}
           </Button>
           <Text size="lg" fw={700} className="self-end">
             Time remaining : {timeFormatter(isTimeLeft)}
