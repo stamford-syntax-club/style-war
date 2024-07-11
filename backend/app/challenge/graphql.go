@@ -61,19 +61,35 @@ func newGqlMutations(challengeRepo ChallengeRepo, timerCh chan Challenge) graphq
 	setActiveChallengeMutation := &graphql.Field{
 		Type: gqlType,
 		Args: graphql.FieldConfigArgument{
-			"id": &graphql.ArgumentConfig{
-				Type: graphql.Int,
+			"setActiveChallengeInput": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.NewInputObject(
+					graphql.InputObjectConfig{
+						Name: "SetActiveChallengeInput",
+						Fields: graphql.InputObjectConfigFieldMap{
+							"id": &graphql.InputObjectFieldConfig{
+								Type: graphql.NewNonNull(graphql.Int),
+							},
+							"duration": &graphql.InputObjectFieldConfig{
+								Type: graphql.NewNonNull(graphql.Int),
+							},
+						},
+					})),
 			},
-			// duration in minutes
 		},
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			log.Println("SetActiveChallenge is called")
-			// set start time here
-			timerCh <- Challenge{ID: 1, StartTime: time.Now(), Duration: 1}
+
+			input := p.Args["setActiveChallengeInput"].(map[string]interface{})
+			id := input["id"].(int)
+			duration := input["duration"].(int)
+
+			// TODO: update active challenge in db
+
+			// start the timer
+			timerCh <- Challenge{ID: id, StartTime: time.Now(), Duration: time.Duration(duration)}
 			return nil, nil
 		},
 	}
-
 	mutations := map[string]*graphql.Field{
 		"setActiveChallenge": setActiveChallengeMutation,
 	}
