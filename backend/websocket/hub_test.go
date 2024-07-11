@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -152,66 +153,77 @@ func (suite *HubTestSuite) TestSyncChallengeExpiration() {
 	})
 }
 
-//	func (suite *HubTestSuite) TestHandleCodeSubmission() {
-//		client := &Client{Id: "test-1", Conn: nil, hub: suite.hub}
-//		admin := &Client{Id: "admin", Conn: nil, hub: suite.hub}
-//
-//		h := NewHub()
-//	}
-
-func (suite *HubTestSuite) TestHandleCodeSubmission() {
-	// timer := time.NewTicker(time.Second)
+func (suite *HubTestSuite) TestHandleMessage() {
 	testHub := NewHub(suite.codeRepo, suite.challengeRepo)
+	suite.Run("CODE EDIT", func() {
+		tests := []struct {
+			name             string
+			msg              *Msg
+			expectedResponse interface{}
+			shouldBeExpired  bool
+			isAdmin          bool
+		}{
+			{
+				name:             "acknowledge submission if not pass submission deadline",
+				msg:              &Msg{Event: "code:edit", Code: &code.Code{UserId: "test-good-khing", Code: "hi", ChallengeId: 1234}},
+				expectedResponse: "Submission from test-good-khing for challenge 1234 received!",
+			},
+			{
+				name:             "broadcast to admin if not nil",
+				msg:              &Msg{Event: "code:edit", Code: &code.Code{UserId: "test-good-khing", Code: "hi", ChallengeId: 1234}},
+				expectedResponse: &Msg{Event: "code:edit", Code: &code.Code{UserId: "test-good-khing", Code: "hi", ChallengeId: 1234}},
+				isAdmin:          true,
+			},
+			{
+				name:             "reject submission if exceed submission deadline",
+				msg:              &Msg{Event: "code:edit", Code: &code.Code{UserId: "test-good-khing", Code: "hi", ChallengeId: 1234}},
+				expectedResponse: "Time is up!",
+				shouldBeExpired:  true,
+			},
+		}
 
-	tests := []struct {
-		name             string
-		msg              *Msg
-		expectedResponse string
-		shouldBeExpired  bool
-	}{
-		{
-			name:             "acknowledge submission if not pass submission deadline",
-			msg:              &Msg{Event: "code:edit", Code: &code.Code{UserId: "test-good-khing", Code: "hi", ChallengeId: 1234}},
-			expectedResponse: "Submission from test-good-khing for challenge 1234 received!",
-		},
-		{
-			name:             "reject submission if exceed submission deadline",
-			msg:              &Msg{Event: "code:edit", Code: &code.Code{UserId: "test-good-khing", Code: "hi", ChallengeId: 1234}},
-			expectedResponse: "Time is up!",
-			shouldBeExpired:  true,
-		},
-	}
+		for _, test := range tests {
+			suite.Run("CODE-EDIT: "+test.name, func() {
+				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					upgrader := websocket.Upgrader{}
+					conn, err := upgrader.Upgrade(w, r, nil)
+					suite.NoError(err)
+					defer conn.Close()
+					for {
+						_, message, _ := conn.ReadMessage()
+						suite.mutex.Lock()
+						defer suite.mutex.Unlock()
+						if test.isAdmin {
+							var message Msg
+							json.Marshal(&message)
+							suite.Equal(test.expectedResponse, message)
+						} else {
+							suite.Equal(test.expectedResponse, string(message))
+						}
+					}
+				}))
+				defer server.Close()
 
-	for _, test := range tests {
-		suite.Run(test.name, func() {
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				upgrader := websocket.Upgrader{}
-				conn, err := upgrader.Upgrade(w, r, nil)
+				url, err := url.Parse(server.URL)
 				suite.NoError(err)
-				defer conn.Close()
-				for {
-					_, message, _ := conn.ReadMessage()
-
-					suite.Equal(test.expectedResponse, string(message))
+				url.Scheme = "ws"
+				conn, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
+				client := NewClient(test.msg.Code.UserId, conn, testHub)
+				testHub.registerClient(client)
+				testHub.mutex.Lock()
+				if test.shouldBeExpired {
+					testHub.challengeExpiration[test.msg.Code.ChallengeId] = endDate
+				} else {
+					testHub.challengeExpiration[test.msg.Code.ChallengeId] = time.Now().Add(time.Hour)
 				}
-			}))
-			defer server.Close()
+				if test.isAdmin {
+					testHub.admin = conn
+				}
+				testHub.mutex.Unlock()
 
-			url, err := url.Parse(server.URL)
-			suite.NoError(err)
-			url.Scheme = "ws"
-			conn, _, err := websocket.DefaultDialer.Dial(url.String(), nil)
-			client := NewClient(test.msg.Code.UserId, conn, testHub)
-			testHub.registerClient(client)
-			testHub.mutex.Lock()
-			if test.shouldBeExpired {
-				testHub.challengeExpiration[test.msg.Code.ChallengeId] = endDate
-			} else {
-				testHub.challengeExpiration[test.msg.Code.ChallengeId] = time.Now().Add(time.Hour)
-			}
-			testHub.mutex.Unlock()
+				testHub.handleMessage(test.msg)
+			})
+		}
+	})
 
-			testHub.handleCodeSubmission(test.msg)
-		})
-	}
 }

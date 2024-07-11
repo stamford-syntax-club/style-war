@@ -76,6 +76,12 @@ func (h *Hub) syncChallengeExpiration() {
 	for _, challenge := range challenges {
 		h.challengeExpiration[challenge.ID] = challenge.End
 	}
+
+	if h.admin != nil {
+		if err := h.admin.WriteJSON(h.challengeExpiration); err != nil {
+			log.Println("error writing updated expiration to admin: ", err)
+		}
+	}
 }
 
 func (h *Hub) handleCodeSubmission(msg *Msg) {
