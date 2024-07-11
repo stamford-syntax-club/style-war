@@ -69,40 +69,20 @@ func (h *Hub) unregisterClient(client *Client) {
 	}
 }
 
-func (h *Hub) syncChallengeExpiration(challenge challenge.Challenge) {
-	h.mutex.Lock()
-	defer h.mutex.Unlock()
-
+func (h *Hub) startTimer(startTime time.Time, duration time.Duration) {
 	// setup end time
-	endDuration := challenge.Duration * time.Minute
-	h.challengeExpiration[challenge.ID] = challenge.StartTime.Add(endDuration)
-
 	if h.timer == nil {
-		h.timer = time.AfterFunc(endDuration, func() {
+		h.timer = time.AfterFunc(duration, func() {
 			log.Println("TIMES UP!!")
 			h.timer = nil
-			// msg := Msg{Event: "timer:status", RemainingTime: 0}
-			// // send update to admin
-			// if h.admin != nil {
-			// 	if err := h.admin.WriteJSON(msg); err != nil {
-			// 		log.Println("error writing updated expiration to admin: ", err)
-			// 	}
-			// }
-			//
-			// // send update to clients
-			// for userId, client := range h.clients {
-			// 	if err := client.WriteJSON(msg); err != nil {
-			// 		log.Printf("error writing updated expiration to %s due to: %v\n", userId, err)
-			// 	}
-			// }
 		})
 		go func() {
 			ticker := time.NewTicker(time.Second)
 			defer ticker.Stop()
 
 			for range ticker.C {
-				elapsed := time.Since(challenge.StartTime)
-				remaining := endDuration - elapsed
+				elapsed := time.Since(startTime)
+				remaining := duration - elapsed
 
 				// stop this func if exceeds endDuration
 				if remaining <= 0 {
@@ -127,8 +107,23 @@ func (h *Hub) syncChallengeExpiration(challenge challenge.Challenge) {
 				}
 			}
 		}()
-
 	}
+}
+
+func (h *Hub) syncChallengeExpiration(challenge *challenge.Challenge) {
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
+
+	if challenge == nil {
+		var err error
+		challenge, err = h.challengeRepo.GetActiveChallenge()
+		if err != nil {
+			log.Println("error retrieving active challenge: ", err)
+			return
+		}
+	}
+
+	h.challengeExpiration[challenge.ID] = challenge.StartTime.Add(challenge.Duration * time.Minute)
 }
 
 func (h *Hub) handleCodeSubmission(msg *Msg) {
@@ -173,6 +168,8 @@ func (h *Hub) Run(ctx context.Context) {
 		close(h.broadcast)
 	}()
 
+	h.syncChallengeExpiration(nil)
+
 	for {
 		select {
 		case client := <-h.register:
@@ -182,7 +179,8 @@ func (h *Hub) Run(ctx context.Context) {
 		case msg := <-h.broadcast:
 			h.handleMessage(msg)
 		case challenge := <-h.timerCh:
-			h.syncChallengeExpiration(challenge)
+			h.syncChallengeExpiration(&challenge)
+			h.startTimer(challenge.StartTime, challenge.Duration*time.Minute)
 		case <-ctx.Done():
 			return
 		}
