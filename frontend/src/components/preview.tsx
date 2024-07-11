@@ -10,9 +10,9 @@ export default function Preview({ value }: PreviewProps) {
     <Box className="min-w-[40%]">
       <Flex direction="row" justify="space-between">
         <Title>Preview</Title>
-        <Button variant="light">
-            <Link href="/challenge">View Challenge</Link>
-        </Button>
+        <Link href="/challenge">
+          <Button variant="light">View Challenge</Button>
+        </Link>
       </Flex>
       <Paper className="min-h-[80vh] border bg-neutral-900 p-1 overflow-hidden">
         <iframe
