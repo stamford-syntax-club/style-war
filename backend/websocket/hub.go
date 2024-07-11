@@ -155,12 +155,6 @@ func (h *Hub) handleCodeSubmission(msg *Msg) {
 	}
 }
 
-func (h *Hub) handleMessage(msg *Msg) {
-	if msg.Event == "code:edit" {
-		h.handleCodeSubmission(msg)
-	}
-}
-
 func (h *Hub) Run(ctx context.Context) {
 	defer func() {
 		close(h.register)
@@ -177,7 +171,9 @@ func (h *Hub) Run(ctx context.Context) {
 		case client := <-h.unregister:
 			h.unregisterClient(client)
 		case msg := <-h.broadcast:
-			h.handleMessage(msg)
+			if msg.Event == "code:edit" {
+				h.handleCodeSubmission(msg)
+			}
 		case challenge := <-h.timerCh:
 			h.syncChallengeExpiration(&challenge)
 			h.startTimer(challenge.StartTime, challenge.Duration*time.Minute)

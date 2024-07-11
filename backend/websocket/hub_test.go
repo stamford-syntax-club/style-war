@@ -36,23 +36,19 @@ func TestHubSuite(t *testing.T) {
 	suite.Run(t, new(HubTestSuite))
 }
 
-var endDate, _ = time.Parse("yyyy-mm-dd", "2024-07-09")
+var startTime time.Time = time.Now()
+var challengeDuration time.Duration = 5
 
 // setup dependecies before running each test
 func (suite *HubTestSuite) SetupSubTest() {
 	suite.challengeRepo = challenge_mock.NewChallengeRepo(suite.Suite.T())
 	suite.codeRepo = code_mock.NewCodeRepo(suite.Suite.T())
-	suite.challengeRepo.On("GetAllChallenges", "id", "end").Return([]challenge.Challenge{
-		{
-			ID:  1,
-			End: endDate,
-		},
-		{
-			ID:  2,
-			End: endDate,
-		},
-	}, nil)
-	suite.hub = NewHub(suite.codeRepo, suite.challengeRepo)
+	suite.challengeRepo.On("GetActiveChallenge").Return(&challenge.Challenge{
+		ID:        1,
+		StartTime: startTime,
+		Duration:  challengeDuration,
+	}, nil).Maybe()
+	suite.hub = NewHub(suite.codeRepo, suite.challengeRepo, nil)
 	suite.ctx, suite.ctxCancel = context.WithTimeout(context.Background(), 2*time.Second)
 	go suite.hub.Run(suite.ctx)
 }
@@ -129,24 +125,34 @@ func (suite *HubTestSuite) TestUnregisterClient() {
 }
 
 func (suite *HubTestSuite) TestSyncChallengeExpiration() {
-	suite.Run("set end date correctly", func() {
+	suite.Run("use the given challenge to set if not nil", func() {
 		ticker := time.NewTicker(time.Second)
-		testHub := NewHub(suite.codeRepo, suite.challengeRepo)
+		testHub := NewHub(suite.codeRepo, suite.challengeRepo, nil)
+		challenge := &challenge.Challenge{ID: 999, StartTime: time.Now(), Duration: 123}
 
-		testHub.syncChallengeExpiration()
+		testHub.syncChallengeExpiration(challenge)
 
 		<-ticker.C
-		suite.Equal(testHub.challengeExpiration[0], endDate)
-		suite.Equal(testHub.challengeExpiration[1], endDate)
+		suite.Equal(challenge.StartTime.Add(challenge.Duration*time.Minute), testHub.challengeExpiration[challenge.ID])
+	})
+
+	suite.Run("get active challenge from db if nil", func() {
+		ticker := time.NewTicker(time.Second)
+		testHub := NewHub(suite.codeRepo, suite.challengeRepo, nil)
+
+		testHub.syncChallengeExpiration(nil)
+
+		<-ticker.C
+		suite.Equal(startTime.Add(challengeDuration*time.Minute), testHub.challengeExpiration[1])
 	})
 
 	suite.Run("empty expiration map if error when getting active challenges", func() {
 		ticker := time.NewTicker(time.Second)
 		mockChallRepo := challenge_mock.NewChallengeRepo(suite.T())
-		mockChallRepo.On("GetAllChallenges", "id", "end").Return(nil, errors.New("test error"))
-		testHub := NewHub(suite.codeRepo, mockChallRepo)
+		mockChallRepo.On("GetActiveChallenge").Return(nil, errors.New("test error"))
+		testHub := NewHub(suite.codeRepo, mockChallRepo, nil)
 
-		testHub.syncChallengeExpiration()
+		testHub.syncChallengeExpiration(nil)
 
 		<-ticker.C
 		suite.Empty(testHub.challengeExpiration)
@@ -154,7 +160,6 @@ func (suite *HubTestSuite) TestSyncChallengeExpiration() {
 }
 
 func (suite *HubTestSuite) TestHandleMessage() {
-	testHub := NewHub(suite.codeRepo, suite.challengeRepo)
 	suite.Run("CODE EDIT", func() {
 		tests := []struct {
 			name             string
@@ -184,6 +189,7 @@ func (suite *HubTestSuite) TestHandleMessage() {
 
 		for _, test := range tests {
 			suite.Run("CODE-EDIT: "+test.name, func() {
+				testHub := NewHub(suite.codeRepo, suite.challengeRepo, nil)
 				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					upgrader := websocket.Upgrader{}
 					conn, err := upgrader.Upgrade(w, r, nil)
@@ -212,7 +218,7 @@ func (suite *HubTestSuite) TestHandleMessage() {
 				testHub.registerClient(client)
 				testHub.mutex.Lock()
 				if test.shouldBeExpired {
-					testHub.challengeExpiration[test.msg.Code.ChallengeId] = endDate
+					testHub.challengeExpiration[test.msg.Code.ChallengeId] = time.Now()
 				} else {
 					testHub.challengeExpiration[test.msg.Code.ChallengeId] = time.Now().Add(time.Hour)
 				}
@@ -220,10 +226,10 @@ func (suite *HubTestSuite) TestHandleMessage() {
 					testHub.admin = conn
 				}
 				testHub.mutex.Unlock()
+				go testHub.Run(suite.ctx)
 
-				testHub.handleMessage(test.msg)
+				testHub.broadcast <- test.msg
 			})
 		}
 	})
-
 }
