@@ -25,7 +25,7 @@ func main() {
 	defer cancel()
 
 	if err := godotenv.Load(); err != nil {
-		log.Fatalln("error loading environment variable: ", err)
+		log.Println("error loading environment variable: ", err)
 	}
 
 	jwtOptionalAuth := common.NewOptionalJWTMiddleware()
