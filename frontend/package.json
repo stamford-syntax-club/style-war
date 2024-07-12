@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "docker:build": "docker build -t stylewars-fe .",
-    "docker:run": "docker run --rm -p 3000:3000 -v ./.env.local:/app/.env stylewars-fe",
+    "docker:build": "docker build -t stylewars-fe:dev .",
+    "docker:run": "docker run --rm -p 3000:3000 -v ./.env.local:/app/.env stylewars-fe:dev",
     "codegen": "graphql-codegen --config codegen.ts",
     "codegen:watch": "graphql-codegen --config codegen.ts --watch"
   },

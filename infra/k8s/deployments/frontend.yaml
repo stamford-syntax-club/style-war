@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fe-deployment
+  labels:
+    app.kubernetes.io/name: fe
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fe
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: fe
+    spec:
+      containers:
+        - name: fe
+          image: stylewars-fe:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: fe-svc-port
+          env:
+            - name: CLERK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: fe-secret
+                  key: CLERK_SECRET_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fe-service
+spec:
+  selector:
+    app.kubernetes.io/name: fe
+  ports:
+    - name: fe-port
+      protocol: TCP
+      port: 3000
+      targetPort: fe-svc-port
