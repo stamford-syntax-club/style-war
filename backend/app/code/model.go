@@ -12,4 +12,5 @@ type Code struct {
 // Any struct with the following method is considered to be CodeRepo
 type CodeRepo interface {
 	GetCode(int, string) (*Code, error)
+	StoreCode(Code) (*Code, error)
 }
