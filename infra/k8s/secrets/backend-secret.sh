@@ -1,0 +1,1 @@
+kubectl create secret generic be-secret --from-literal=JWT_SECRET=<SECRET_HERE> --from-literal=DB_HOST=postgres-service --from-literal=DB_USER=<USER_HERE> --from-literal=DB_PASSWORD=<PASSWORD_HERE> --from-literal=DB_NAME=stylewars-dev --from-literal=DB_PORT=5432

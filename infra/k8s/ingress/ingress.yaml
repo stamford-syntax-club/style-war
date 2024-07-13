@@ -5,7 +5,8 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - http:
+    - host: "stylewars.localhost"
+      http:
         paths:
           - pathType: Prefix
             path: "/"
@@ -14,14 +15,33 @@ spec:
                 name: fe-service
                 port:
                   number: 3000
-    #
-    # - host: "stylewars-be.*"
-    #   http:
-    #     paths:
-    #       - pathType: Prefix
-    #         path: "/foo"
-    #         backend:
-    #           service:
-    #             name: service2
-    #             port:
-    #               number: 80
+    - host: "stylewars.stamford.dev"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: fe-service
+                port:
+                  number: 3000
+    - host: "stylewars-be.localhost"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/graphql"
+            backend:
+              service:
+                name: be-service
+                port:
+                  number: 8080
+    - host: "stylewars-be.stamford.dev"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/graphql"
+            backend:
+              service:
+                name: be-service
+                port:
+                  number: 8080

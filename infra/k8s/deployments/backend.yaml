@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: be-deployment
+  labels:
+    app.kubernetes.io/name: be
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: be
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: be
+    spec:
+      containers:
+        - name: be
+          image: stylewars-be
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: be-svc-port
+          envFrom:
+            - secretRef:
+                name: be-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: be-service
+spec:
+  selector:
+    app.kubernetes.io/name: be
+  ports:
+    - name: be-port
+      protocol: TCP
+      port: 8080
+      targetPort: be-svc-port
