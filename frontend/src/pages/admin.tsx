@@ -5,11 +5,22 @@ import { useEffect, useState, useCallback } from "react";
 
 const teams = new Array(6).fill("Team");
 
+interface Message {
+  event: string;
+  remainingTime: number;
+}
+
 function AdminPage() {
   useSocket((message) => {
-    const data = JSON.parse(message.data);
-    console.log("Received message:", data);
-    setRemainingTime(data.remainingTime);
+    try {
+      const msg = JSON.parse(message.data) as Message;
+      if (msg.event === "timer:status") {
+        console.log("remaning time", msg.remainingTime);
+        setRemainingTime(msg.remainingTime);
+      }
+    } catch (error) {
+      console.warn("Failed to parse message:", error, "Data:", message.data);
+    }
   }, "admin");
 
   const [remainingTime, setRemainingTime] = useState(0);
