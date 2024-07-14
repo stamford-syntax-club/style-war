@@ -1,9 +1,14 @@
 import { Container, Flex } from "@mantine/core";
 import CodeEditor from "@/components/code-editor";
 import Preview from "@/components/preview";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSocket } from "@/lib/websocket/ws";
 import { useCode } from "@/lib/data-hooks/use-code";
+
+interface message {
+  event: string;
+  remainingTime: number;
+}
 
 export default function Playground() {
   // NOTE: for now the retrieved data is fixed because db implementation isn't finished yet!
@@ -19,7 +24,27 @@ export default function Playground() {
 </html>`,
   );
 
+  const [remainingTime, setRemainingTime] = useState<number | null>(null);
+
   const socket = useSocket();
+
+  useEffect(() => {
+    if (socket?.readyState !== 1) return;
+
+    socket.onmessage = function (ev) {
+      if (!ev.data) {
+        return;
+      }
+
+      try {
+        const msg = JSON.parse(ev.data) as message;
+        console.log(msg);
+        setRemainingTime(msg.remainingTime);
+      } catch (error) {
+        console.warn("Failed to parse message:", error, "Data:", ev.data);
+      }
+    };
+  }, [socket?.readyState]);
 
   const handleChangeValue = (newValue: string | undefined) => {
     if (!newValue) {
@@ -40,10 +65,10 @@ export default function Playground() {
 
   return (
     <Container fluid>
+      {remainingTime !== null ? remainingTime : "Loading..."}
       <Flex justify="center" gap="md" align="center" mt="md">
         <CodeEditor value={value} onChange={handleChangeValue} />
         <Preview value={value} />
-        {codeData?.code?.userId} {codeData?.code?.challengeId}
       </Flex>
     </Container>
   );

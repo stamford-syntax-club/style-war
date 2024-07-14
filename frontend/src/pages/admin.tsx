@@ -14,8 +14,8 @@ function AdminPage() {
   useEffect(() => {
     if (!socket) return;
     socket.onmessage = function (ev) {
-      console.log(JSON.parse(ev.data).RemainingTime);
-      setRemainingTime(JSON.parse(ev.data).RemainingTime);
+      console.log(JSON.parse(ev.data).remainingTime);
+      setRemainingTime(JSON.parse(ev.data).remainingTime);
     };
   }, [socket]);
 
@@ -23,7 +23,7 @@ function AdminPage() {
     <Container fluid>
       <Button
         onClick={() => {
-          mutate({ id: 1, duration: 2 });
+          mutate({ id: 1, duration: 1 });
         }}
       >
         Start!
