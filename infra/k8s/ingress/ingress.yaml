@@ -5,8 +5,8 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: "stylewars.localhost"
-      http:
+    # - host: "stylewars.localhost"
+    - http:
         paths:
           - pathType: Prefix
             path: "/"
