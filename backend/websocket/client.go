@@ -13,7 +13,7 @@ type Msg struct {
 	Event         string               `json:"event"`
 	Code          *code.Code           `json:"code"`
 	Challenge     *challenge.Challenge `json:"challenge"`
-	RemainingTime time.Duration
+	RemainingTime time.Duration        `json:"remainingTime"`
 }
 
 type Client struct {

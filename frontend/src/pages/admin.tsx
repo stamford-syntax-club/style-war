@@ -1,29 +1,36 @@
 import { useSetActiveChallenge } from "@/lib/data-hooks/use-set-challenge";
 import { useSocket } from "@/lib/websocket/ws";
 import { Button, Container, Text } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 const teams = new Array(6).fill("Team");
 
+interface Message {
+  event: string;
+  remainingTime: number;
+}
+
 function AdminPage() {
-  const socket = useSocket("admin");
+  useSocket((message) => {
+    try {
+      const msg = JSON.parse(message.data) as Message;
+      if (msg.event === "timer:status") {
+        console.log("remaning time", msg.remainingTime);
+        setRemainingTime(msg.remainingTime);
+      }
+    } catch (error) {
+      console.warn("Failed to parse message:", error, "Data:", message.data);
+    }
+  }, "admin");
 
   const [remainingTime, setRemainingTime] = useState(0);
   const { mutate } = useSetActiveChallenge();
-
-  useEffect(() => {
-    if (!socket) return;
-    socket.onmessage = function (ev) {
-      console.log(JSON.parse(ev.data).RemainingTime);
-      setRemainingTime(JSON.parse(ev.data).RemainingTime);
-    };
-  }, [socket]);
 
   return (
     <Container fluid>
       <Button
         onClick={() => {
-          mutate({ id: 1, duration: 2 });
+          mutate({ id: 1, duration: 1 });
         }}
       >
         Start!
