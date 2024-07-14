@@ -1,23 +1,19 @@
 import { useSetActiveChallenge } from "@/lib/data-hooks/use-set-challenge";
 import { useSocket } from "@/lib/websocket/ws";
 import { Button, Container, Text } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 const teams = new Array(6).fill("Team");
 
 function AdminPage() {
-  const socket = useSocket("admin");
+  useSocket((message) => {
+    const data = JSON.parse(message.data);
+    console.log("Received message:", data);
+    setRemainingTime(data.remainingTime);
+  }, "admin");
 
   const [remainingTime, setRemainingTime] = useState(0);
   const { mutate } = useSetActiveChallenge();
-
-  useEffect(() => {
-    if (!socket) return;
-    socket.onmessage = function (ev) {
-      console.log(JSON.parse(ev.data).remainingTime);
-      setRemainingTime(JSON.parse(ev.data).remainingTime);
-    };
-  }, [socket]);
 
   return (
     <Container fluid>
