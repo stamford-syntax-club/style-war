@@ -1,14 +1,6 @@
 import { useSetActiveChallenge } from "@/lib/data-hooks/use-set-challenge";
 import { useSocket } from "@/lib/websocket/ws";
-import {
-  Button,
-  Container,
-  Text,
-  Grid,
-  Flex,
-  Card,
-  Center,
-} from "@mantine/core";
+import { Button, Container, Text, Grid, Flex, Card, Center } from "@mantine/core";
 import { useEffect, useState, useCallback } from "react";
 
 interface Message {
@@ -53,17 +45,17 @@ function AdminPage() {
       </Text>
 
       <Grid mt={15}>
-        <Grid.Col span={8}>
+        <Grid.Col span={8} style={{ display: 'flex', justifyContent: 'center' }}>
           <Flex wrap="wrap" gap="md">
             {teams.map((team, index) => (
-              <Flex key={index} justify="center" style={{ width: 660 }}>
+              <Flex key={index} style={{ margin: '10px auto' }}>
                 <Card
                   shadow="md"
                   padding="lg"
                   radius="md"
                   style={{
-                    width: 660,
-                    height: 380,
+                    width: 640,
+                    height: 360,
                     backgroundColor: "#3b82f6",
                     color: "white",
                     display: "flex",
