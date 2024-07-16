@@ -88,7 +88,7 @@ function AdminPage() {
             flexDirection: "column",
           }}
         >
-          <Text size="28px" fw={700} mb="md" align="center">
+          <Text size="28px" fw={700} mb="md" td="center">
             TIMER
           </Text>
           <Text size="24px" td="center">
