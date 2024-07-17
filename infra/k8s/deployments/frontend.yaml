@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: fe
-          image: stylewars-fe:dev
-          imagePullPolicy: IfNotPresent
+          image: chinathaip/stylewars-fe:dev
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
               name: fe-svc-port

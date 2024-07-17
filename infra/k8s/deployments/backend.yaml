@@ -5,7 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/name: be
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: be
@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: be
-          image: stylewars-be
-          imagePullPolicy: IfNotPresent
+          image: chinathaip/stylewars-be:woah
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
               name: be-svc-port
