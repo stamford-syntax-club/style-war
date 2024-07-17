@@ -15,6 +15,7 @@ export default function CodeEditor({
 }: CodeEditorProps) {
   const editorRef = useRef<any>(null);
   const isDisabled = remainingTime === 0 || remainingTime === null;
+  const clerk = useClerk();
 
   useEffect(() => {
     if (editorRef.current) {
