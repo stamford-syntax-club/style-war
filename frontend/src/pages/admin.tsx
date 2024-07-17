@@ -1,20 +1,39 @@
 import { useSetActiveChallenge } from "@/lib/data-hooks/use-set-challenge";
 import { useSocket } from "@/lib/websocket/ws";
-import { Button, Container, Text, Grid, Flex, Card, Center } from "@mantine/core";
-import { useEffect, useState, useCallback } from "react";
+import {
+  Button,
+  Container,
+  Text,
+  Grid,
+  Flex,
+  Card,
+  Center,
+} from "@mantine/core";
+import { useState } from "react";
 
 interface Message {
   event: string;
+  code: string;
+  userId: string;
   remainingTime: number;
 }
 
 function AdminPage() {
+  const [codes, setCodes] = useState<Record<string, string>>();
   useSocket((message) => {
     try {
       const msg = JSON.parse(message.data) as Message;
       if (msg.event === "timer:status") {
-        console.log("remaning time", msg.remainingTime);
         setRemainingTime(msg.remainingTime);
+      }
+
+      if (msg.event === "code:edit") {
+        setCodes((prev) => {
+          return {
+            ...prev,
+            [msg.userId]: msg.code,
+          };
+        });
       }
     } catch (error) {
       console.warn("Failed to parse message:", error, "Data:", message.data);
@@ -45,10 +64,13 @@ function AdminPage() {
       </Text>
 
       <Grid mt={15}>
-        <Grid.Col span={8} style={{ display: 'flex', justifyContent: 'center' }}>
+        <Grid.Col
+          span={8}
+          style={{ display: "flex", justifyContent: "center" }}
+        >
           <Flex wrap="wrap" gap="md">
             {teams.map((team, index) => (
-              <Flex key={index} style={{ margin: '10px auto' }}>
+              <Flex key={index} style={{ margin: "10px auto" }}>
                 <Card
                   shadow="md"
                   padding="lg"
