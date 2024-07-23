@@ -7,7 +7,7 @@ import {
   Grid,
   Flex,
   Card,
-  Center,
+  Paper
 } from "@mantine/core";
 import { useState } from "react";
 
@@ -19,7 +19,10 @@ interface Message {
 }
 
 function AdminPage() {
-  const [codes, setCodes] = useState<Record<string, string>>();
+  const [codes, setCodes] = useState<Record<string, string>>({});
+  const [remainingTime, setRemainingTime] = useState(0);
+  const { mutate } = useSetActiveChallenge();
+
   useSocket((message) => {
     try {
       const msg = JSON.parse(message.data) as Message;
@@ -41,8 +44,6 @@ function AdminPage() {
   }, "admin");
 
   const teams = new Array(6).fill("Team");
-  const [remainingTime, setRemainingTime] = useState(0);
-  const { mutate } = useSetActiveChallenge();
 
   return (
     <Container fluid>
@@ -69,28 +70,51 @@ function AdminPage() {
           style={{ display: "flex", justifyContent: "center" }}
         >
           <Flex wrap="wrap" gap="md">
-            {teams.map((team, index) => (
-              <Flex key={index} style={{ margin: "10px auto" }}>
-                <Card
-                  shadow="md"
-                  padding="lg"
-                  radius="md"
-                  style={{
-                    width: 640,
-                    height: 360,
-                    backgroundColor: "#3b82f6",
-                    color: "white",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text td={Center} fw={700} size="lg">
-                    {team} {index + 1}
-                  </Text>
-                </Card>
-              </Flex>
-            ))}
+            {teams.map((team, index) => {
+              const userId = `user${index + 1}`;
+              const code = codes[userId] || "";
+
+              return (
+                <Flex key={index} style={{ margin: "10px auto" }}>
+                  <Card
+                    shadow="md"
+                    padding="lg"
+                    radius="md"
+                    style={{
+                      width: 640,
+                      height: 360,
+                      backgroundColor: "#3b82f6",
+                      color: "white",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      position: "relative",
+                    }}
+                  >
+                    <Text td="center" fw={700} size="lg">
+                      {team} {index + 1}
+                    </Text>
+                    {code && (
+                      <Paper
+                        className="w-full h-full border bg-neutral-900 p-1 overflow-hidden"
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          zIndex: 1,
+                        }}
+                      >
+                        <iframe
+                          title={`preview-${index}`}
+                          srcDoc={code}
+                          className="w-full h-full border-none"
+                        />
+                      </Paper>
+                    )}
+                  </Card>
+                </Flex>
+              );
+            })}
           </Flex>
         </Grid.Col>
         <Grid.Col
@@ -110,8 +134,11 @@ function AdminPage() {
           </Text>
         </Grid.Col>
       </Grid>
+      </Container >
+  );
+}
 
-      {/* <div className="flex mt-6">
+{/* <div className="flex mt-6">
         <div className="w-3/4 flex flex-wrap gap-4">
           {teams.map((team, index) => (
             <div key={index} className="flex justify-center">
@@ -126,8 +153,6 @@ function AdminPage() {
           <div className="text-center text-2xl">{remainingTime}</div>
         </div>
       </div> */}
-    </Container>
-  );
-}
+
 
 export default AdminPage;
