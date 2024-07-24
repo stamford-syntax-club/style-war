@@ -1,11 +1,17 @@
 import { Container, Flex } from "@mantine/core";
 import CodeEditor from "@/components/code-editor";
 import Preview from "@/components/preview";
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSocket } from "@/lib/websocket/ws";
 import { useCode } from "@/lib/data-hooks/use-code";
 
+interface Message {
+  event: string;
+  remainingTime: number;
+}
+
 export default function Playground() {
+  const { data: codeData, isLoading, isError } = useCode(1);
   const [value, setValue] = useState(
     `<!DOCTYPE html>
 <html>
@@ -16,23 +22,27 @@ export default function Playground() {
     </body>
 </html>`,
   );
+  const [remainingTime, setRemainingTime] = useState<number | null>(null);
 
-  const socket = useSocket();
-
-  // NOTE: for now the retrieved data is fixed because db implementation isn't finished yet!
-  const { data: codeData, isLoading, isError } = useCode(5);
+  const socket = useSocket((message) => {
+    try {
+      const msg = JSON.parse(message.data) as Message;
+      console.log("Received message:", msg);
+      setRemainingTime(msg.remainingTime);
+    } catch (error) {
+      console.warn("Failed to parse message:", error, "Data:", message.data);
+    }
+  });
 
   const handleChangeValue = (newValue: string | undefined) => {
-    if (!newValue) {
-      return;
-    }
+    if (!newValue) return;
 
     socket?.send(
       JSON.stringify({
         event: "code:edit",
         code: {
           code: newValue,
-          challengeId: 1, //TODO: get from backend
+          challengeId: 1, // TODO: get from backend
         },
       }),
     );
@@ -41,10 +51,10 @@ export default function Playground() {
 
   return (
     <Container fluid>
+      <div>{remainingTime !== null ? remainingTime : "Loading..."}</div>
       <Flex justify="center" gap="md" align="center" mt="md">
         <CodeEditor value={value} onChange={handleChangeValue} timeDuration={15}/> 
         <Preview value={value} />
-        {codeData?.code?.userId} {codeData?.code?.challengeId}
       </Flex>
     </Container>
   );

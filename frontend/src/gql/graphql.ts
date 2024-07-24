@@ -32,6 +32,16 @@ export type Code = {
   userId?: Maybe<Scalars['String']['output']>;
 };
 
+export type Mutation = {
+  __typename?: 'Mutation';
+  setActiveChallenge?: Maybe<Challenge>;
+};
+
+
+export type MutationSetActiveChallengeArgs = {
+  setActiveChallengeInput: SetActiveChallengeInput;
+};
+
 export type Query = {
   __typename?: 'Query';
   challenge?: Maybe<Challenge>;
@@ -45,7 +55,12 @@ export type QueryChallengeArgs = {
 
 
 export type QueryCodeArgs = {
-  challengeId?: InputMaybe<Scalars['Int']['input']>;
+  challenge_id?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type SetActiveChallengeInput = {
+  duration: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
 };
 
 export type CodeQueryVariables = Exact<{
@@ -55,5 +70,13 @@ export type CodeQueryVariables = Exact<{
 
 export type CodeQuery = { __typename?: 'Query', code?: { __typename?: 'Code', id?: string | null, code?: string | null, challengeId?: number | null, userId?: string | null } | null };
 
+export type SetActiveChallengeMutationVariables = Exact<{
+  setActiveChallengeInput: SetActiveChallengeInput;
+}>;
 
-export const CodeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Code"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"challengeId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"challengeId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"challengeId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"challengeId"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}}]}}]}}]} as unknown as DocumentNode<CodeQuery, CodeQueryVariables>;
+
+export type SetActiveChallengeMutation = { __typename?: 'Mutation', setActiveChallenge?: { __typename?: 'Challenge', id?: string | null } | null };
+
+
+export const CodeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Code"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"challengeId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"challenge_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"challengeId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"challengeId"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}}]}}]}}]} as unknown as DocumentNode<CodeQuery, CodeQueryVariables>;
+export const SetActiveChallengeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SetActiveChallenge"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"setActiveChallengeInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SetActiveChallengeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setActiveChallenge"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"setActiveChallengeInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"setActiveChallengeInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<SetActiveChallengeMutation, SetActiveChallengeMutationVariables>;

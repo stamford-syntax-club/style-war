@@ -5,7 +5,7 @@ import request from "graphql-request";
 
 const codeQuery = graphql(`
   query Code($challengeId: Int!) {
-    code(challengeId: $challengeId) {
+    code(challenge_id: $challengeId) {
       id
       code
       challengeId

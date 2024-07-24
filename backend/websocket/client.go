@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"log"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/stamford-syntax-club/style-war/backend/app/challenge"
@@ -9,9 +10,10 @@ import (
 )
 
 type Msg struct {
-	Event     string               `json:"event"`
-	Code      *code.Code           `json:"code"`
-	Challenge *challenge.Challenge `json:"challenge"`
+	Event         string               `json:"event"`
+	Code          *code.Code           `json:"code"`
+	Challenge     *challenge.Challenge `json:"challenge"`
+	RemainingTime time.Duration        `json:"remainingTime"`
 }
 
 type Client struct {

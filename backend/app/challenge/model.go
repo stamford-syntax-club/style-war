@@ -11,8 +11,8 @@ type Challenge struct {
 	ImageUrl   string         `json:"imageUrl"`
 	Objectives pq.StringArray `gorm:"type:text[]" json:"objectives"`
 	IsActive   bool           `json:"isActive"`
-	Start      time.Time
-	End        time.Time
+	StartTime  time.Time
+	Duration   time.Duration
 }
 
 // Any struct with the following method is considered to be ChallengeRepo

@@ -55,14 +55,15 @@ func main() {
 	codeRepo := code.NewCodeRepoImpl(db)
 
 	// GraphQL Server
+	timerCh := make(chan challenge.Challenge)
 	codeGql := code.NewGraphQL(codeRepo)
-	challengeGql := challenge.NewGraphQL(challengeRepo)
+	challengeGql := challenge.NewGraphQL(challengeRepo, timerCh)
 	gqlHandler := graphql.CreateHandler(challengeGql, codeGql)
 	app.GET("/graphql", jwtOptionalAuth.MiddlewareFunc(), gqlHandler)
 	app.POST("/graphql", jwtOptionalAuth.MiddlewareFunc(), gqlHandler)
 
 	// Websocket Server
-	h := websocket.NewHub(codeRepo, challengeRepo)
+	h := websocket.NewHub(codeRepo, challengeRepo, timerCh)
 	go h.Run(ctx)
 	app.GET("/ws/:room", jwtAuth.MiddlewareFunc(), func(c *gin.Context) {
 		room := c.Param("room")

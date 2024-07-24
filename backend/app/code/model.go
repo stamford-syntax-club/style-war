@@ -1,13 +1,16 @@
 package code
 
+import "github.com/stamford-syntax-club/style-war/backend/app/challenge"
+
 type Code struct {
-	ID          int    `json:"id"`
-	UserId      string `json:"userId"`
+	UserId      string `gorm:"primaryKey" json:"userId"`
+	ChallengeId int    `gorm:"primaryKey" json:"challengeId"`
 	Code        string `json:"code"`
-	ChallengeId int    `json:"challengeId"`
+	Challenge   challenge.Challenge
 }
 
 // Any struct with the following method is considered to be CodeRepo
 type CodeRepo interface {
 	GetCode(int, string) (*Code, error)
+	StoreCode(Code) (*Code, error)
 }

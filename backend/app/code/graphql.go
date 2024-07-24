@@ -1,6 +1,8 @@
 package code
 
 import (
+	"errors"
+
 	"github.com/graphql-go/graphql"
 )
 
@@ -10,7 +12,7 @@ type GraphQL struct {
 }
 
 func NewGraphQL(codeRepo CodeRepo) *GraphQL {
-	return &GraphQL{Queries: newGqlQueries(codeRepo)}
+	return &GraphQL{Queries: newGqlQueries(codeRepo), Mutations: newGqlMutations(codeRepo)}
 }
 
 var gqlType = graphql.NewObject(graphql.ObjectConfig{
@@ -54,4 +56,44 @@ func newGqlQueries(codeRepo CodeRepo) graphql.Fields {
 	}
 
 	return queries
+}
+
+func newGqlMutations(codeRepo CodeRepo) graphql.Fields {
+	storeCodeMutations := &graphql.Field{
+		Type: gqlType,
+		Args: graphql.FieldConfigArgument{
+			"storeCodeInput": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.NewInputObject(
+					graphql.InputObjectConfig{
+						Name: "StoreCodeInput",
+						Fields: graphql.InputObjectConfigFieldMap{
+							"challenge_id": &graphql.InputObjectFieldConfig{
+								Type: graphql.NewNonNull(graphql.Int),
+							},
+							"code": &graphql.InputObjectFieldConfig{
+								Type: graphql.NewNonNull(graphql.String),
+							},
+						},
+					},
+				)),
+			},
+		},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			userId := p.Context.Value("currentUser").(string)
+			if userId == "" {
+				return nil, errors.New("missing userId")
+			}
+
+			input := p.Args["storeCodeInput"].(map[string]interface{})
+			challengeId := input["challenge_id"].(int)
+			code := input["code"].(string)
+			return codeRepo.StoreCode(Code{ChallengeId: challengeId, Code: code, UserId: userId})
+		},
+	}
+
+	mutations := map[string]*graphql.Field{
+		"storeCode": storeCodeMutations,
+	}
+
+	return mutations
 }
