@@ -5,9 +5,10 @@ import { Box, Title } from "@mantine/core";
 interface CodeEditorProps {
   value: string;
   onChange: (value: string | undefined) => void;
+  isDisabled?: boolean;
 }
 
-export default function CodeEditor({ value, onChange }: CodeEditorProps) {
+export default function CodeEditor({ value, onChange, isDisabled }: CodeEditorProps) {
   return (
     <Box>
       <Title>Code Editor</Title>
@@ -17,10 +18,11 @@ export default function CodeEditor({ value, onChange }: CodeEditorProps) {
         width="50vw"
         defaultLanguage="html"
         language="html, css"
-        defaultValue="<!-- Write your code here -->"
+        defaultValue=""
         theme="vs-dark"
         value={value}
         onChange={(newValue) => onChange(newValue || "")}
+        options={{readOnly: isDisabled, domReadOnly: isDisabled}}
       />
     </Box>
   );

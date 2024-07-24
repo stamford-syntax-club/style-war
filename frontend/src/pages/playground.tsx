@@ -1,7 +1,7 @@
 import { Container, Flex } from "@mantine/core";
 import CodeEditor from "@/components/code-editor";
 import Preview from "@/components/preview";
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { useSocket } from "@/lib/websocket/ws";
 import { useCode } from "@/lib/data-hooks/use-code";
 
@@ -49,11 +49,13 @@ export default function Playground() {
     setValue(newValue);
   };
 
+  const isEditingDisabled = remainingTime === 0 || isLoading || remainingTime === null;
+
   return (
     <Container fluid>
       <div>{remainingTime !== null ? remainingTime : "Loading..."}</div>
       <Flex justify="center" gap="md" align="center" mt="md">
-        <CodeEditor value={value} onChange={handleChangeValue} />
+        <CodeEditor value={value} onChange={handleChangeValue} isDisabled={isEditingDisabled} />
         <Preview value={value} />
       </Flex>
     </Container>
