@@ -49,7 +49,7 @@ function AdminPage() {
   return (
     <Container fluid>
       <div className="flex sticky top-14 z-10">
-        <div className=" bg-black w-full h-16 content-center">
+        <div className=" bg-black rounded-2xl w-full h-16 content-center">
           <Grid mt={8}>
             <GridCol span={4}>
               <Button
@@ -67,6 +67,12 @@ function AdminPage() {
                 fw={700}
                 size="28px">
                 Admin Panel
+              </Text>
+            </GridCol>
+
+            <GridCol span={4}>
+              <Text size="24px" pl="20px">
+                Remaining Time: {remainingTime}
               </Text>
             </GridCol>
           </Grid>
@@ -126,7 +132,6 @@ function AdminPage() {
           );
         })}
       </Flex>
-
 
     </Container >
   );
