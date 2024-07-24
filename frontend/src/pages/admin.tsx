@@ -1,7 +1,15 @@
 import { useSetActiveChallenge } from "@/lib/data-hooks/use-set-challenge";
 import { useSocket } from "@/lib/websocket/ws";
-import { Button, Container, Text, Grid, Flex, Card, Paper } from "@mantine/core";
-import { useEffect, useState } from "react";
+import {
+  Button,
+  Container,
+  Text,
+  Grid,
+  Flex,
+  Card,
+  Paper
+} from "@mantine/core";
+import { useState } from "react";
 
 interface Message {
   event: string;
@@ -15,35 +23,25 @@ function AdminPage() {
   const [remainingTime, setRemainingTime] = useState(0);
   const { mutate } = useSetActiveChallenge();
 
-  const socket = useSocket("admin");
+  useSocket((message) => {
+    try {
+      const msg = JSON.parse(message.data) as Message;
+      if (msg.event === "timer:status") {
+        setRemainingTime(msg.remainingTime);
+      }
 
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      try {
-        const msg = JSON.parse(event.data) as Message;
-        console.log("Received message:", msg);
-
-        if (msg.event === "timer:status") {
-          setRemainingTime(msg.remainingTime);
-        }
-
-        if (msg.event === "code:edit") {
-          setCodes((prev) => ({
+      if (msg.event === "code:edit") {
+        setCodes((prev) => {
+          return {
             ...prev,
             [msg.userId]: msg.code,
-          }));
-        }
-      } catch (error) {
-        console.warn("Failed to parse message:", error, "Data:", event.data);
+          };
+        });
       }
-    };
-
-    socket.addEventListener("message", handleMessage);
-
-    return () => {
-      socket.removeEventListener("message", handleMessage);
-    };
-  }, [socket]);
+    } catch (error) {
+      console.warn("Failed to parse message:", error, "Data:", message.data);
+    }
+  }, "admin");
 
   const teams = new Array(6).fill("Team");
 
@@ -67,7 +65,10 @@ function AdminPage() {
       </Text>
 
       <Grid mt={15}>
-        <Grid.Col span={8} style={{ display: "flex", justifyContent: "center" }}>
+        <Grid.Col
+          span={8}
+          style={{ display: "flex", justifyContent: "center" }}
+        >
           <Flex wrap="wrap" gap="md">
             {teams.map((team, index) => {
               const userId = `user${index + 1}`;
@@ -90,7 +91,7 @@ function AdminPage() {
                       position: "relative",
                     }}
                   >
-                    <Text ta="center" fw={700} size="lg">
+                    <Text td="center" fw={700} size="lg">
                       {team} {index + 1}
                     </Text>
                     {code && (
@@ -125,20 +126,17 @@ function AdminPage() {
             flexDirection: "column",
           }}
         >
-          <Text size="28px" fw={700} mb="md" ta="center">
+          <Text size="28px" fw={700} mb="md" td="center">
             TIMER
           </Text>
-          <Text size="24px" ta="center">
+          <Text size="24px" td="center">
             {remainingTime}
           </Text>
         </Grid.Col>
       </Grid>
-    </Container>
+      </Container >
   );
 }
-
-export default AdminPage;
-
 
 {/* <div className="flex mt-6">
         <div className="w-3/4 flex flex-wrap gap-4">
@@ -155,3 +153,6 @@ export default AdminPage;
           <div className="text-center text-2xl">{remainingTime}</div>
         </div>
       </div> */}
+
+
+export default AdminPage;
