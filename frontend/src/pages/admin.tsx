@@ -7,7 +7,8 @@ import {
   Grid,
   Flex,
   Card,
-  Paper
+  Paper,
+  GridCol
 } from "@mantine/core";
 import { useState } from "react";
 
@@ -47,96 +48,106 @@ function AdminPage() {
 
   return (
     <Container fluid>
-      <Button
-        onClick={() => {
-          mutate({ id: 1, duration: 1 });
-        }}
-      >
-        Start!
-      </Button>
-      <Text
-        ta="center"
-        style={{ fontSize: "26px" }}
-        fw={900}
-        variant="gradient"
-        gradient={{ from: "blue", to: "cyan", deg: 90 }}
-      >
-        Admin Panel
-      </Text>
+      <div className="flex sticky top-14 z-10">
+        <div className=" bg-black w-full h-16 content-center">
+          <Grid mt={8}>
+            <GridCol span={4}>
+              <Button
+                onClick={() => {
+                  mutate({ id: 1, duration: 1 });
+                }}
+              >
+                Start!
+              </Button>
+            </GridCol>
 
-      <Grid mt={15}>
-        <Grid.Col
-          span={8}
-          style={{ display: "flex", justifyContent: "center" }}
-        >
-          <Flex wrap="wrap" gap="md">
-            {teams.map((team, index) => {
-              const userId = `user${index + 1}`;
-              const code = codes[userId] || "";
+            <GridCol span={4}>
+              <Text
+                ta="center"
+                fw={700}
+                size="28px">
+                Admin Panel
+              </Text>
+            </GridCol>
+          </Grid>
+        </div>
+      </div>
 
-              return (
-                <Flex key={index} style={{ margin: "10px auto" }}>
-                  <Card
-                    shadow="md"
-                    padding="lg"
-                    radius="md"
+      <Flex
+        align="center"
+        justify="center"
+        wrap="wrap"
+        gap="md"
+        style={{ width: "100%" }}
+      >
+        {teams.map((team, index) => {
+          const userId = `user${index + 1}`;
+          const code = codes[userId] || "";
+
+          return (
+            <Flex key={index} style={{ margin: "10px 10px" }}>
+              <Card
+                shadow="md"
+                padding="lg"
+                radius="md"
+                style={{
+                  width: 800,
+                  height: 500,
+                  backgroundColor: "#3b82f6",
+                  color: "white",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  position: "relative",
+                }}
+              >
+                <Text td="center" fw={700} size="lg">
+                  {team} {index + 1}
+                </Text>
+                {code && (
+                  <Paper
+                    className="w-full h-full border bg-neutral-900 p-1 overflow-hidden"
                     style={{
-                      width: 640,
-                      height: 360,
-                      backgroundColor: "#3b82f6",
-                      color: "white",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      position: "relative",
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      zIndex: 1,
                     }}
                   >
-                    <Text td="center" fw={700} size="lg">
-                      {team} {index + 1}
-                    </Text>
-                    {code && (
-                      <Paper
-                        className="w-full h-full border bg-neutral-900 p-1 overflow-hidden"
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          zIndex: 1,
-                        }}
-                      >
-                        <iframe
-                          title={`preview-${index}`}
-                          srcDoc={code}
-                          className="w-full h-full border-none"
-                        />
-                      </Paper>
-                    )}
-                  </Card>
-                </Flex>
-              );
-            })}
-          </Flex>
-        </Grid.Col>
-        <Grid.Col
-          span={4}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: "column",
-          }}
-        >
-          <Text size="28px" fw={700} mb="md" td="center">
-            TIMER
-          </Text>
-          <Text size="24px" td="center">
-            {remainingTime}
-          </Text>
-        </Grid.Col>
-      </Grid>
-      </Container >
+                    <iframe
+                      title={`preview-${index}`}
+                      srcDoc={code}
+                      className="w-full h-full border-none"
+                    />
+                  </Paper>
+                )}
+              </Card>
+            </Flex>
+          );
+        })}
+      </Flex>
+
+
+    </Container >
   );
 }
+
+// <Grid.Col
+// span={4}
+// style={{
+//   display: "flex",
+//   justifyContent: "center",
+//   alignItems: "center",
+//   flexDirection: "column",
+// }}
+// >
+// <Text size="28px" fw={700} mb="md" td="center">
+//   TIMER
+// </Text>
+// <Text size="24px" td="center">
+//   {remainingTime}
+// </Text>
+// </Grid.Col>
 
 {/* <div className="flex mt-6">
         <div className="w-3/4 flex flex-wrap gap-4">
@@ -153,6 +164,5 @@ function AdminPage() {
           <div className="text-center text-2xl">{remainingTime}</div>
         </div>
       </div> */}
-
 
 export default AdminPage;
