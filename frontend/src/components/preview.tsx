@@ -1,5 +1,5 @@
-import { Paper, Title, Box, Button, Flex } from "@mantine/core";
-import Link from "next/link";
+import { Paper, Title, Box, Flex } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
 import Challenge from "@/pages/challenge";
 
 interface PreviewProps {
@@ -7,6 +7,8 @@ interface PreviewProps {
 }
 
 export default function Preview({ value }: PreviewProps) {
+  const [debouncedValue] = useDebouncedValue(value, 1000);
+
   return (
     <Box className="min-w-[40%]">
       <Flex direction="row" justify="space-between">
@@ -16,7 +18,7 @@ export default function Preview({ value }: PreviewProps) {
       <Paper className="min-h-[80vh] border bg-neutral-900 p-1 overflow-hidden">
         <iframe
           title="preview"
-          srcDoc={value}
+          srcDoc={debouncedValue}
           className="w-full min-h-[80vh] border-none"
         />
       </Paper>
