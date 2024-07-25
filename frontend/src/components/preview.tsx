@@ -11,7 +11,7 @@ export default function Preview({ value }: PreviewProps) {
 
   return (
     <Box className="min-w-[40%]">
-      <Flex direction="row" justify="space-between">
+      <Flex direction="row">
         <Title>Preview</Title>
         <Challenge />
       </Flex>
