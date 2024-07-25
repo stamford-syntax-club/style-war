@@ -8,7 +8,9 @@ import {
   Flex,
   Card,
   Paper,
-  GridCol
+  GridCol,
+  Box,
+  Title,
 } from "@mantine/core";
 import { useState } from "react";
 
@@ -19,7 +21,7 @@ interface Message {
   remainingTime: number;
 }
 
-function AdminPage() {
+export default function AdminPage() {
   const [codes, setCodes] = useState<Record<string, string>>({});
   const [remainingTime, setRemainingTime] = useState(0);
   const { mutate } = useSetActiveChallenge();
@@ -48,7 +50,7 @@ function AdminPage() {
 
   return (
     <Container fluid>
-      <div className="flex sticky top-14 z-10">
+      {/* <div className="flex sticky top-14 z-10">
         <div className=" bg-black rounded-2xl w-full h-16 content-center">
           <Grid mt={8}>
             <GridCol span={4}>
@@ -62,10 +64,7 @@ function AdminPage() {
             </GridCol>
 
             <GridCol span={4}>
-              <Text
-                ta="center"
-                fw={700}
-                size="28px">
+              <Text ta="center" fw={700} size="28px">
                 Admin Panel
               </Text>
             </GridCol>
@@ -77,25 +76,36 @@ function AdminPage() {
             </GridCol>
           </Grid>
         </div>
-      </div>
-
-      <Flex
-        align="center"
-        justify="center"
-        wrap="wrap"
-        gap="md"
-        style={{ width: "100%" }}
-      >
+      </div> */}
+      <Box className="sticky top-14 z-10 bg-neutral-900">
+        <Flex justify="space-evenly" align="center">
+          <Button
+            onClick={() => {
+              mutate({ id: 1, duration: 1 });
+            }}
+            w={165}
+            size="md"
+          >
+            Start
+          </Button>
+          <Title order={1} size={50}>
+            Admin Panel
+          </Title>
+          <Text className="text-2xl">Remaining Time: {remainingTime}</Text>
+        </Flex>
+      </Box>
+      <Flex align="center" justify="center" wrap="wrap">
         {teams.map((team, index) => {
           const userId = `user${index + 1}`;
           const code = codes[userId] || "";
 
           return (
-            <Flex key={index} style={{ margin: "10px 10px" }}>
+            <Flex key={index} justify="space-between">
               <Card
                 shadow="md"
                 padding="lg"
                 radius="md"
+                className="flex justify-center items-center m-2"
                 style={{
                   width: 800,
                   height: 500,
@@ -105,14 +115,14 @@ function AdminPage() {
                   justifyContent: "center",
                   alignItems: "center",
                   position: "relative",
-                }}
+                }} //isn't all this style prop redundant? can't we just use the className?
               >
                 <Text td="center" fw={700} size="lg">
                   {team} {index + 1}
                 </Text>
                 {code && (
                   <Paper
-                    className="w-full h-full border bg-neutral-900 p-1 overflow-hidden"
+                    className="w-full h-full border bg-blue-900 p-1 overflow-hidden"
                     style={{
                       position: "absolute",
                       top: 0,
@@ -132,8 +142,7 @@ function AdminPage() {
           );
         })}
       </Flex>
-
-    </Container >
+    </Container>
   );
 }
 
@@ -154,7 +163,8 @@ function AdminPage() {
 // </Text>
 // </Grid.Col>
 
-{/* <div className="flex mt-6">
+{
+  /* <div className="flex mt-6">
         <div className="w-3/4 flex flex-wrap gap-4">
           {teams.map((team, index) => (
             <div key={index} className="flex justify-center">
@@ -168,6 +178,5 @@ function AdminPage() {
           <div className="text-center text-4xl font-bold p-4">TIMER</div>
           <div className="text-center text-2xl">{remainingTime}</div>
         </div>
-      </div> */}
-
-export default AdminPage;
+      </div> */
+}
