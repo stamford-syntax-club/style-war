@@ -4,11 +4,9 @@ import {
   Button,
   Container,
   Text,
-  Grid,
   Flex,
   Card,
   Paper,
-  GridCol,
   Box,
   Title,
 } from "@mantine/core";
@@ -30,6 +28,7 @@ export default function AdminPage() {
     try {
       const msg = JSON.parse(message.data) as Message;
       if (msg.event === "timer:status") {
+        console.log("remaning time", msg.remainingTime);
         setRemainingTime(msg.remainingTime);
       }
 
@@ -44,9 +43,9 @@ export default function AdminPage() {
     } catch (error) {
       console.warn("Failed to parse message:", error, "Data:", message.data);
     }
-  }, "admin");
+  });
 
-  const teams = new Array(6).fill("Team");
+  const userIds = Array.from({ length: 6 }, (_, i) => `user${i + 1}`);
 
   return (
     <Container fluid>
@@ -68,37 +67,30 @@ export default function AdminPage() {
         </Flex>
       </Box>
       <Flex align="center" justify="center" wrap="wrap">
-        {teams.map((team, index) => {
-          const userId = `user${index + 1}`;
+        {userIds.map((userId, index) => {
           const code = codes[userId] || "";
 
           return (
-            <Flex key={index} justify="space-between">
+            <Flex key={index} justify="center" m={2} style={{ position: 'relative' }}>
               <Card
                 shadow="md"
                 padding="lg"
                 radius="md"
-                className="flex justify-center items-center m-2 w-[800px] h-[500px] bg-blue-500 text-white relative"
+                className="m-2 w-[800px] h-[500px] bg-blue-500 text-white"
+                style={{ position: 'relative' }} 
               >
-                <Text td="center" fw={700} size="lg">
-                  {team} {index + 1}
-                </Text>
                 {code && (
-                  <Paper
-                    className="w-full h-full border bg-blue-900 p-1 overflow-hidden"
+                  <iframe
+                    title={`preview-${index}`}
+                    srcDoc={code}
+                    className="w-full h-full border-none"
                     style={{
-                      position: "absolute",
+                      position: 'absolute', 
                       top: 0,
                       left: 0,
-                      zIndex: 1,
+                      zIndex: 10, 
                     }}
-                  >
-                    <iframe
-                      title={`preview-${index}`}
-                      srcDoc={code}
-                      className="w-full h-full border-none"
-                    />
-                  </Paper>
+                  />
                 )}
               </Card>
             </Flex>
@@ -109,7 +101,7 @@ export default function AdminPage() {
   );
 }
 
-      {/* <div className="flex sticky top-14 z-10">
+{/* <div className="flex sticky top-14 z-10">
         <div className=" bg-black rounded-2xl w-full h-16 content-center">
           <Grid mt={8}>
             <GridCol span={4}>
