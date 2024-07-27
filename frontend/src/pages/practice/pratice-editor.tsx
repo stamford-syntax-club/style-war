@@ -53,20 +53,21 @@ export default function PracticeEditor({
         <Title>Code Editor</Title>
         <Box className="flex justify-end">
           <Button
+          size="xs"
             variant="filled"
             onClick={handleStart}
-            disabled={isTimeLeft === 0}
-            color={isEditorEnabled ? "yellow" : "green"}
+            disabled={isTimeLeft > 0 && isEditorEnabled}
+            color={!isEditorEnabled ? "green" : ""}
             mr="md"
           >
             {isTimeLeft === 0
-              ? "Cooked"
+              ? "Restart"
               : isEditorEnabled
               ? "Cooking"
               : "Start"}
           </Button>
           <Text size="lg" fw={700} className="self-end">
-            Time remaining : {timeFormatter(isTimeLeft)}
+            Time remaining : {`${timeFormatter(isTimeLeft)}s`}
           </Text>
         </Box>
       </Flex>
@@ -76,7 +77,7 @@ export default function PracticeEditor({
         width="50vw"
         defaultLanguage="html"
         language="html, css"
-        defaultValue="<!-- Write your code here -->"
+        defaultValue=""
         theme="vs-dark"
         value={value}
         onChange={(newValue) => onChange(newValue || "")}

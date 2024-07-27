@@ -1,14 +1,11 @@
-import { Container, Flex, Text } from "@mantine/core";
+import { Container, Flex, Modal, Text, Title } from "@mantine/core";
 import CodeEditor from "./pratice-editor";
 import Preview from "./parctice-preview";
 import { useState } from "react";
-
-interface Message {
-  event: string;
-  remainingTime: number;
-}
+import { useDisclosure } from "@mantine/hooks";
 
 export default function PracticePlayground() {
+  const [opened, {open, close}] = useDisclosure(true);
   const [value, setValue] = useState(
     `<!DOCTYPE html>
 <html>
@@ -29,11 +26,16 @@ export default function PracticePlayground() {
 
   return (
     <Container fluid>
+      <Modal title="Practice Playground" opened={opened} onClose={close} centered>
+        <Text>
+            This is a practice playground where you get familiar with the platform before the compition. Blah Blah Blah 
+        </Text>
+      </Modal>
       <Flex justify="center" gap="md" align="center" mt="md">
         <CodeEditor
           value={value}
           onChange={handleChangeValue}
-          timeDuration={300}
+          timeDuration={10}
         />
         <Preview value={value} />
       </Flex>
