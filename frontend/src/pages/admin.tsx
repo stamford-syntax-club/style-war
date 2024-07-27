@@ -6,7 +6,6 @@ import {
   Text,
   Flex,
   Card,
-  Paper,
   Box,
   Title,
 } from "@mantine/core";
