@@ -76,7 +76,7 @@ export default function AdminPage() {
                 padding="lg"
                 radius="md"
                 className="m-2 w-[800px] h-[500px] bg-blue-500 text-white"
-                style={{ position: 'relative' }} 
+                style={{ position: 'relative' }}
               >
                 {code && (
                   <iframe
@@ -84,10 +84,10 @@ export default function AdminPage() {
                     srcDoc={code}
                     className="w-full h-full border-none"
                     style={{
-                      position: 'absolute', 
+                      position: 'absolute',
                       top: 0,
                       left: 0,
-                      zIndex: 10, 
+                      zIndex: 10,
                     }}
                   />
                 )}
@@ -144,7 +144,6 @@ export default function AdminPage() {
 //   {remainingTime}
 // </Text>
 // </Grid.Col>
-
 {
   /* <div className="flex mt-6">
         <div className="w-3/4 flex flex-wrap gap-4">

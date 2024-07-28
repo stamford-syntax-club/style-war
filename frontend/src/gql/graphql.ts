@@ -35,11 +35,17 @@ export type Code = {
 export type Mutation = {
   __typename?: 'Mutation';
   setActiveChallenge?: Maybe<Challenge>;
+  storeCode?: Maybe<Code>;
 };
 
 
 export type MutationSetActiveChallengeArgs = {
   setActiveChallengeInput: SetActiveChallengeInput;
+};
+
+
+export type MutationStoreCodeArgs = {
+  storeCodeInput: StoreCodeInput;
 };
 
 export type Query = {
@@ -63,6 +69,16 @@ export type SetActiveChallengeInput = {
   id: Scalars['Int']['input'];
 };
 
+export type StoreCodeInput = {
+  challenge_id: Scalars['Int']['input'];
+  code: Scalars['String']['input'];
+};
+
+export type ChallengeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ChallengeQuery = { __typename?: 'Query', challenge?: { __typename?: 'Challenge', imageUrl?: string | null, isActive?: boolean | null, objectives?: Array<string | null> | null } | null };
+
 export type CodeQueryVariables = Exact<{
   challengeId: Scalars['Int']['input'];
 }>;
@@ -78,5 +94,6 @@ export type SetActiveChallengeMutationVariables = Exact<{
 export type SetActiveChallengeMutation = { __typename?: 'Mutation', setActiveChallenge?: { __typename?: 'Challenge', id?: string | null } | null };
 
 
+export const ChallengeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Challenge"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"challenge"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}},{"kind":"Field","name":{"kind":"Name","value":"objectives"}}]}}]}}]} as unknown as DocumentNode<ChallengeQuery, ChallengeQueryVariables>;
 export const CodeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Code"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"challengeId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"challenge_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"challengeId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"challengeId"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}}]}}]}}]} as unknown as DocumentNode<CodeQuery, CodeQueryVariables>;
 export const SetActiveChallengeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SetActiveChallenge"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"setActiveChallengeInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SetActiveChallengeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setActiveChallenge"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"setActiveChallengeInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"setActiveChallengeInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<SetActiveChallengeMutation, SetActiveChallengeMutationVariables>;

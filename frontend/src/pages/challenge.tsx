@@ -1,11 +1,16 @@
 import React from "react";
-import { Container, Flex, Modal, Button } from "@mantine/core";
+import { List, Container, Flex, Modal, Button } from "@mantine/core";
 import Mountain from "../../public/digital-art-beautiful-mountains.jpg";
 import { useDisclosure } from "@mantine/hooks";
 import Ref from "@/components/challenge-ref";
 import Obj from "@/components/challenge-obj";
 
-export default function Challenge() {
+interface challenge {
+  objectives: (string | null)[];
+  imageUrl: string;
+  isActive: boolean;
+}
+export default function Challenge({ objectives, imageUrl, isActive }: challenge) {
   const [opened, { open, close }] = useDisclosure(false);
   return (
     <>
@@ -17,8 +22,8 @@ export default function Challenge() {
           size="100%"
         >
           <Flex justify="center" gap="md" align="center" mt="md">
-            <Obj value="very good" />
-            <Ref img={Mountain.src} closeButton={close} />
+            <Obj value={objectives ?? [""]} />
+            <Ref img={imageUrl} closeButton={close} />
           </Flex>
         </Modal>
       </Container>
