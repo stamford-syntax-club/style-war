@@ -1,4 +1,4 @@
-import { Box, Title, Paper, List, Table } from "@mantine/core";
+import { Box, Title, Paper, List } from "@mantine/core";
 import React from "react";
 
 
@@ -18,10 +18,9 @@ export default function Obj({ value }: value) {
     <Box>
       <Title>Objectives</Title>
       <Paper className="border border-gray-600 rounded p-1 h-[80vh] w-[50vw]">
-        <List type="ordered" size="sm">
+        <List type="ordered" size="sm" className="list-disc">
           <List.Item>hello</List.Item>
         </List>
-        <h1 className="list-disc">hello</h1>
       </Paper>
     </Box>
   );
