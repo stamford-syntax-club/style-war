@@ -5,8 +5,7 @@ import { useEffect, useState } from "react";
 import { useSocket } from "@/lib/websocket/ws";
 import { useCode } from "@/lib/data-hooks/use-code";
 import { IconCheck, IconX } from "@tabler/icons-react";
-import { useChallenge } from "@/lib/data-hooks/use-challenge";
-import Challenge from "@/pages/challenge";
+
 
 interface Message {
 	event: string;
@@ -23,11 +22,7 @@ export default function Playground() {
 	}>({ show: false, message: "", color: "" });
 	const xIcon = <IconX style={{ width: rem(20), height: rem(20) }} />;
 	const checkIcon = <IconCheck style={{ width: rem(20), height: rem(20) }} />;
-	const {
-		data: challengeData,
-		isLoading: loadingChallnge,
-		isError: errorChallenge,
-	} = useChallenge();
+	
 	const [value, setValue] = useState(
 		`<!DOCTYPE html>
 <html>
@@ -49,16 +44,32 @@ export default function Playground() {
 	});
 
 	useEffect(() => {
-		if (socket) {
+		// if (socket) {
+		// 	setShowNotification({
+		// 		show: true,
+		// 		message: "Connected to the backend!",
+		// 		color: "green",
+		// 	});
+		// } else if (isError || !socket) {
+		// 	setShowNotification({
+		// 		show: true,
+		// 		message: "Failed to connect to the backend!",
+		// 		color: "red",
+		// 	});
+		// }
+
+		try {
+			if (socket){
+				setShowNotification({
+					show: true,
+					message: "Code loaded successfully!",
+					color: "green",
+				});
+			} 
+		} catch(isError) {
 			setShowNotification({
 				show: true,
-				message: "Connected to the backend!",
-				color: "green",
-			});
-		} else if (isError || !socket) {
-			setShowNotification({
-				show: true,
-				message: "Failed to connect to the backend!",
+				message: "Failed to load code!",
 				color: "red",
 			});
 		}
@@ -121,11 +132,7 @@ export default function Playground() {
 					remainingTime={remainingTime}
 				/>
 				<Preview value={value} />
-				<Challenge
-					objectives={challengeData?.challenge?.objectives ?? [""]}
-					isActive={challengeData?.challenge?.isActive ?? true}
-					imageUrl={challengeData?.challenge?.imageUrl ?? ""}
-				/>
+				
 			</Flex>
 		</Container>
 	);

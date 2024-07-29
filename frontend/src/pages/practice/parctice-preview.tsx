@@ -13,7 +13,6 @@ export default function PracticePreview({ value }: PracticePreviewProps) {
     <Box className="min-w-[40%]">
       <Flex direction="row">
         <Title>Preview</Title>
-        <Challenge />
       </Flex>
       <Paper className="min-h-[80vh] border bg-neutral-900 p-1 overflow-hidden">
         <iframe
