@@ -1,4 +1,4 @@
-import { Container, Flex, Notification, rem } from "@mantine/core";
+import { Container, Flex, Notification, rem, Loader } from "@mantine/core";
 import CodeEditor from "@/components/code-editor";
 import Preview from "@/components/preview";
 import { useEffect, useState } from "react";
@@ -14,11 +14,12 @@ interface Message {
 export default function Playground() {
   const { data: codeData, isLoading, isError } = useCode(1);
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
+  const [isConnection, setIsConnection] = useState(true);
   const [showNotification, setShowNotification] = useState<{
     show: boolean;
     message: string;
     color: string;
-  }>({ show: false, message: "", color: "" });
+  }>({ show: true, message: "Trying to connect to backend :P", color: "none"});
   const xIcon = <IconX style={{ width: rem(20), height: rem(20) }} />;
   const checkIcon = <IconCheck style={{ width: rem(20), height: rem(20) }} />;
 
@@ -43,42 +44,43 @@ export default function Playground() {
   });
 
   useEffect(() => {
-    // if (socket) {
-    // 	setShowNotification({
-    // 		show: true,
-    // 		message: "Connected to the backend!",
-    // 		color: "green",
-    // 	});
-    // } else if (isError || !socket) {
-    // 	setShowNotification({
-    // 		show: true,
-    // 		message: "Failed to connect to the backend!",
-    // 		color: "red",
-    // 	});
-    // }
+    let timer: NodeJS.Timeout;
 
-    try {
+    const checkConnection = () => {
       if (socket) {
         setShowNotification({
           show: true,
-          message: "Connected to the backend!",
+          message: "Connected to backend ^.^",
           color: "green",
         });
+        setIsConnection(false);
+      } else if (isError) {
+        setShowNotification({
+          show: true,
+          message: "Failed to connect to backend TvT",
+          color: "red",
+        });
+        setIsConnection(false);
+      } else {
+        timer = setTimeout(checkConnection, 500);
       }
-    } catch (isError) {
-      setShowNotification({
-        show: true,
-        message: "Failed to connect to the backend!",
-        color: "red",
-      });
-    }
+    };
 
-    const timer = setTimeout(() => {
-      setShowNotification((prev) => ({ ...prev, show: false }));
-    }, 5000);
+    checkConnection();
 
-    return () => clearTimeout(timer);
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [socket, isError]);
+
+  useEffect(() => {
+    if (showNotification.show) {
+      const timer = setTimeout(() => {
+        setShowNotification({show: false, message: "", color: "none"});
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showNotification.show]);
 
   const handleChangeValue = (newValue: string | undefined) => {
     if (!newValue) return;
@@ -100,10 +102,10 @@ export default function Playground() {
       {/* notification box */}
       {showNotification.show && (
         <Notification
-          icon={showNotification.color === "green" ? checkIcon : xIcon}
+          icon={isConnection ? <Loader color="blue" /> : showNotification.color === "green" ? checkIcon : xIcon}
           color={showNotification.color}
           title={
-            showNotification.color === "green" ? "All Good!" : "Opps! Bummer"
+            isConnection ? "Connecting na! wait" : showNotification.color === "green" ? "Success" : "Error"
           }
           onClose={() =>
             setShowNotification((prev) => ({
@@ -123,7 +125,6 @@ export default function Playground() {
           {showNotification.message}
         </Notification>
       )}
-
       <Flex justify="center" gap="md" align="center" mt="md">
         <CodeEditor
           value={value}
