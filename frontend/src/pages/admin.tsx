@@ -7,8 +7,7 @@ import {
   Flex,
   Card,
   Box,
-  Title,
-  Paper
+  Title
 } from "@mantine/core";
 import { useState } from "react";
 
@@ -47,7 +46,7 @@ export default function AdminPage() {
 
   return (
     <Container fluid>
-      <Box className="sticky top-14 bg-neutral-900 rounded-2xl">
+      <Box className="sticky top-[58px] bg-neutral-900 rounded-2xl h-16 content-center" >
         <Flex justify="space-evenly" align="center">
           <Button
             onClick={() => {
@@ -58,19 +57,21 @@ export default function AdminPage() {
           >
             Start
           </Button>
-          <Title order={1} size={46}>
-            Admin Panel
-          </Title>
+          <Text
+            size="32px  "
+            fw={900}
+            variant="gradient"
+            gradient={{ from: 'blue', to: 'cyan', deg: 140 }}
+          >
+            ADMIN PANEL
+          </Text>
           <Text className="text-2xl">Remaining Time: {remainingTime}</Text>
         </Flex>
       </Box>
       <Flex align="center" justify="center" wrap="wrap">
         {Object.entries(codes).map(([userId, code]) => (
           <Card
-            shadow="md"
-            padding="lg"
-            radius="md"
-            className="flex justify-center items-center m-2 w-[800px] h-[500px] bg-black text-white relative"
+            className="flex justify-center items-center m-2 w-[700px] h-[450px] bg-neutral-900 text-white relative"
           >
             <Text fw={500}>{userId}</Text>
             <iframe

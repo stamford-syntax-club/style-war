@@ -15,7 +15,7 @@
     "@clerk/themes": "^2.1.10",
     "@graphql-codegen/cli": "^5.0.2",
     "@graphql-codegen/introspection": "^4.0.3",
-    "@mantine/core": "^7.11.0",
+    "@mantine/core": "^7.11.2",
     "@mantine/hooks": "^7.11.0",
     "@mantine/notifications": "^7.11.2",
     "@monaco-editor/react": "^4.6.0",
