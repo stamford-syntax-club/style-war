@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useSocket } from "@/lib/websocket/ws";
 import { useCode } from "@/lib/data-hooks/use-code";
 import { IconCheck, IconX } from "@tabler/icons-react";
+import { notifications } from "@mantine/notifications";
 
 interface Message {
   event: string;
@@ -61,9 +62,7 @@ export default function Playground() {
           color: "red",
         });
         setIsConnection(false);
-      } else {
-        timer = setTimeout(checkConnection, 500);
-      }
+      } 
     };
 
     checkConnection();
@@ -74,13 +73,13 @@ export default function Playground() {
   }, [socket, isError]);
 
   useEffect(() => {
-    if (showNotification.show) {
+    if (!isConnection && showNotification.show) {
       const timer = setTimeout(() => {
         setShowNotification({show: false, message: "", color: "none"});
       }, 5000);
       return () => clearTimeout(timer);
     }
-  }, [showNotification.show]);
+  }, [isConnection,showNotification.show]);
 
   const handleChangeValue = (newValue: string | undefined) => {
     if (!newValue) return;
