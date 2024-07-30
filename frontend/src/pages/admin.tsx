@@ -8,13 +8,13 @@ import {
   Card,
   Box,
   Title,
+  Paper
 } from "@mantine/core";
 import { useState } from "react";
 
 interface Message {
   event: string;
-  code: string;
-  userId: string;
+  code: { code: string; userId: string };
   remainingTime: number;
 }
 
@@ -32,23 +32,22 @@ export default function AdminPage() {
       }
 
       if (msg.event === "code:edit") {
+        console.log(msg);
         setCodes((prev) => {
           return {
             ...prev,
-            [msg.userId]: msg.code,
+            [msg.code.userId]: msg.code.code,
           };
         });
       }
     } catch (error) {
       console.warn("Failed to parse message:", error, "Data:", message.data);
     }
-  });
-
-  const userIds = Array.from({ length: 6 }, (_, i) => `user${i + 1}`);
+  }, "admin");
 
   return (
     <Container fluid>
-      <Box className="sticky top-14 z-10 bg-neutral-900 rounded-2xl">
+      <Box className="sticky top-14 bg-neutral-900 rounded-2xl">
         <Flex justify="space-evenly" align="center">
           <Button
             onClick={() => {
@@ -66,37 +65,23 @@ export default function AdminPage() {
         </Flex>
       </Box>
       <Flex align="center" justify="center" wrap="wrap">
-        {userIds.map((userId, index) => {
-          const code = codes[userId] || "";
-
-          return (
-            <Flex key={index} justify="center" m={2} style={{ position: 'relative' }}>
-              <Card
-                shadow="md"
-                padding="lg"
-                radius="md"
-                className="m-2 w-[800px] h-[500px] bg-blue-500 text-white"
-                style={{ position: 'relative' }}
-              >
-                {code && (
-                  <iframe
-                    title={`preview-${index}`}
-                    srcDoc={code}
-                    className="w-full h-full border-none"
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      zIndex: 10,
-                    }}
-                  />
-                )}
-              </Card>
-            </Flex>
-          );
-        })}
+        {Object.entries(codes).map(([userId, code]) => (
+          <Card
+            shadow="md"
+            padding="lg"
+            radius="md"
+            className="flex justify-center items-center m-2 w-[800px] h-[500px] bg-black text-white relative"
+          >
+            <Text fw={500}>{userId}</Text>
+            <iframe
+              title="preview"
+              srcDoc={code}
+              style={{ width: '100%', height: 400, border: 'none' }}
+            />
+          </Card>
+        ))}
       </Flex>
-    </Container>
+    </Container >
   );
 }
 
