@@ -53,7 +53,7 @@ export default function PracticeEditor({
         <Title>Code Editor</Title>
         <Box className="flex justify-end">
           <Button
-          size="xs"
+            size="xs"
             variant="filled"
             onClick={handleStart}
             disabled={isTimeLeft > 0 && isEditorEnabled}
