@@ -41,7 +41,7 @@ export default function Playground() {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </body>
-</html>`
+</html>`,
   );
 
   const socket = useSocket((message) => {
@@ -54,6 +54,9 @@ export default function Playground() {
     }
   });
 
+  // TODO:  this should just be a callback from useSocket
+  // currently we have "onMessage" callback which receives remainingTime from backend
+  // we can have "onConnect" and "onError" callback which triggers the notification without having to set the states ourselves
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
@@ -101,7 +104,7 @@ export default function Playground() {
           code: newValue,
           challengeId: 1, // TODO: get from backend
         },
-      })
+      }),
     );
     setValue(newValue);
   };
@@ -125,8 +128,8 @@ export default function Playground() {
             isConnection
               ? "Connecting na! wait"
               : showNotification.color === "green"
-              ? "Success"
-              : "Error"
+                ? "Success"
+                : "Error"
           }
           onClose={() =>
             setShowNotification((prev) => ({

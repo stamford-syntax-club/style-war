@@ -3,6 +3,7 @@ import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 
 export function useSocket(
   onMessage: (ev: MessageEvent<any>) => void,
+  // here can have onOpen, onClose, onError
   room: string = "competition",
 ) {
   const { session } = useSession();
@@ -22,15 +23,18 @@ export function useSocket(
       const ws = new WebSocket(`ws://localhost:8080/ws/${room}?token=${token}`);
       ws.onopen = function () {
         console.log("WebSocket connection open");
+        // onOpen(....)
         socket.current = ws;
       };
       ws.onclose = function () {
         console.log("WebSocket connection closed, attempting to reconnect");
+        // onClose(....)
         setTimeout(() => {
           connect();
         }, 3000);
       };
       ws.onerror = function (error) {
+        // onError(...)
         console.error("WebSocket error:", error);
       };
       ws.onmessage = function (message) {
