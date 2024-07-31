@@ -54,9 +54,7 @@ export default function Playground() {
     }
   });
 
-  // TODO:  this should just be a callback from useSocket
-  // currently we have "onMessage" callback which receives remainingTime from backend
-  // we can have "onConnect" and "onError" callback which triggers the notification without having to set the states ourselves
+  // TODO:  this logic can be simplified into what's shown in lib/websocket/ws.ts
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
