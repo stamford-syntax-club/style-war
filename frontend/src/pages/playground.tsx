@@ -6,6 +6,7 @@ import { useSocket } from "@/lib/websocket/ws";
 import { useCode } from "@/lib/data-hooks/use-code";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
+import { useSearchParams } from "next/navigation";
 
 interface Message {
   event: string;
@@ -13,6 +14,7 @@ interface Message {
 }
 
 export default function Playground() {
+  const searchParams = useSearchParams();
   const { data: codeData, isLoading, isError } = useCode(1);
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
   const [isConnection, setIsConnection] = useState(true);
@@ -37,9 +39,11 @@ export default function Playground() {
     </style>
   </head>
   <body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- DO NOT REMOVE this line -->
     <h1> Edit your code here </h1>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
   </body>
 </html>`,
   );
@@ -151,7 +155,9 @@ export default function Playground() {
         <CodeEditor
           value={value}
           onChange={handleChangeValue}
-          remainingTime={remainingTime}
+          remainingTime={
+            searchParams.get("mode") === "dev" ? 999999999999 : remainingTime
+          }
         />
         <Preview value={value} />
       </Flex>
