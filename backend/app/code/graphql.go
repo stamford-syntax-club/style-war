@@ -19,7 +19,7 @@ var gqlType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Code",
 	Fields: graphql.Fields{
 		"id": &graphql.Field{
-			Type: graphql.ID,
+			Type: graphql.Int,
 		},
 
 		"userId": &graphql.Field{

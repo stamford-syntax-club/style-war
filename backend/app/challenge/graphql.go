@@ -20,7 +20,7 @@ var gqlType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Challenge",
 	Fields: graphql.Fields{
 		"id": &graphql.Field{
-			Type: graphql.ID,
+			Type: graphql.Int,
 		},
 
 		"imageUrl": &graphql.Field{

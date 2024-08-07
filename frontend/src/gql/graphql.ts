@@ -18,7 +18,7 @@ export type Scalars = {
 
 export type Challenge = {
   __typename?: 'Challenge';
-  id?: Maybe<Scalars['ID']['output']>;
+  id?: Maybe<Scalars['Int']['output']>;
   imageUrl?: Maybe<Scalars['String']['output']>;
   isActive?: Maybe<Scalars['Boolean']['output']>;
   objectives?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
@@ -28,7 +28,7 @@ export type Code = {
   __typename?: 'Code';
   challengeId?: Maybe<Scalars['Int']['output']>;
   code?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['ID']['output']>;
+  id?: Maybe<Scalars['Int']['output']>;
   userId?: Maybe<Scalars['String']['output']>;
 };
 
@@ -52,6 +52,7 @@ export type Query = {
   __typename?: 'Query';
   challenge?: Maybe<Challenge>;
   code?: Maybe<Code>;
+  codeForChallenge?: Maybe<Array<Maybe<Code>>>;
 };
 
 
@@ -62,6 +63,11 @@ export type QueryChallengeArgs = {
 
 export type QueryCodeArgs = {
   challenge_id?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryCodeForChallengeArgs = {
+  challenge_id: Scalars['Int']['input'];
 };
 
 export type SetActiveChallengeInput = {
@@ -77,23 +83,23 @@ export type StoreCodeInput = {
 export type ChallengeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ChallengeQuery = { __typename?: 'Query', challenge?: { __typename?: 'Challenge', imageUrl?: string | null, isActive?: boolean | null, objectives?: Array<string | null> | null } | null };
+export type ChallengeQuery = { __typename?: 'Query', challenge?: { __typename?: 'Challenge', id?: number | null, imageUrl?: string | null, isActive?: boolean | null, objectives?: Array<string | null> | null } | null };
 
 export type CodeQueryVariables = Exact<{
   challengeId: Scalars['Int']['input'];
 }>;
 
 
-export type CodeQuery = { __typename?: 'Query', code?: { __typename?: 'Code', id?: string | null, code?: string | null, challengeId?: number | null, userId?: string | null } | null };
+export type CodeQuery = { __typename?: 'Query', code?: { __typename?: 'Code', id?: number | null, code?: string | null, challengeId?: number | null, userId?: string | null } | null };
 
 export type SetActiveChallengeMutationVariables = Exact<{
   setActiveChallengeInput: SetActiveChallengeInput;
 }>;
 
 
-export type SetActiveChallengeMutation = { __typename?: 'Mutation', setActiveChallenge?: { __typename?: 'Challenge', id?: string | null } | null };
+export type SetActiveChallengeMutation = { __typename?: 'Mutation', setActiveChallenge?: { __typename?: 'Challenge', id?: number | null } | null };
 
 
-export const ChallengeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Challenge"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"challenge"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}},{"kind":"Field","name":{"kind":"Name","value":"objectives"}}]}}]}}]} as unknown as DocumentNode<ChallengeQuery, ChallengeQueryVariables>;
+export const ChallengeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Challenge"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"challenge"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}},{"kind":"Field","name":{"kind":"Name","value":"objectives"}}]}}]}}]} as unknown as DocumentNode<ChallengeQuery, ChallengeQueryVariables>;
 export const CodeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Code"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"challengeId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"code"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"challenge_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"challengeId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"challengeId"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}}]}}]}}]} as unknown as DocumentNode<CodeQuery, CodeQueryVariables>;
 export const SetActiveChallengeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SetActiveChallenge"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"setActiveChallengeInput"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SetActiveChallengeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setActiveChallenge"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"setActiveChallengeInput"},"value":{"kind":"Variable","name":{"kind":"Name","value":"setActiveChallengeInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<SetActiveChallengeMutation, SetActiveChallengeMutationVariables>;

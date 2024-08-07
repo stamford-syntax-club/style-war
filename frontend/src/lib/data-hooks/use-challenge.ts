@@ -3,17 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import request from "graphql-request";
 
 const codeQuery = graphql(`
-    query Challenge {
+  query Challenge {
     challenge {
-        imageUrl
-        isActive
-        objectives
+      id
+      imageUrl
+      isActive
+      objectives
     }
-}
+  }
 `);
 
 export function useChallenge() {
-
   return useQuery({
     queryKey: ["challenge"],
     queryFn: async () => {

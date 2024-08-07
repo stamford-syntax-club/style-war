@@ -13,7 +13,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n    query Challenge {\n    challenge {\n        imageUrl\n        isActive\n        objectives\n    }\n}\n": types.ChallengeDocument,
+    "\n  query Challenge {\n    challenge {\n      id\n      imageUrl\n      isActive\n      objectives\n    }\n  }\n": types.ChallengeDocument,
     "\n  query Code($challengeId: Int!) {\n    code(challenge_id: $challengeId) {\n      id\n      code\n      challengeId\n      userId\n    }\n  }\n": types.CodeDocument,
     "\n  mutation SetActiveChallenge(\n    $setActiveChallengeInput: SetActiveChallengeInput!\n  ) {\n    setActiveChallenge(setActiveChallengeInput: $setActiveChallengeInput) {\n      id\n    }\n  }\n": types.SetActiveChallengeDocument,
 };
@@ -35,7 +35,7 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n    query Challenge {\n    challenge {\n        imageUrl\n        isActive\n        objectives\n    }\n}\n"): (typeof documents)["\n    query Challenge {\n    challenge {\n        imageUrl\n        isActive\n        objectives\n    }\n}\n"];
+export function graphql(source: "\n  query Challenge {\n    challenge {\n      id\n      imageUrl\n      isActive\n      objectives\n    }\n  }\n"): (typeof documents)["\n  query Challenge {\n    challenge {\n      id\n      imageUrl\n      isActive\n      objectives\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
