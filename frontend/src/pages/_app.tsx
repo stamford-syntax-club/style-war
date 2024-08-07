@@ -1,6 +1,7 @@
 import "@mantine/core/styles.css";
 import "../styles/globals.css";
 
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { AppProps } from "next/app";
 import { createTheme, MantineProvider } from "@mantine/core";
 import { dark } from "@clerk/themes";
@@ -8,7 +9,7 @@ import Head from "next/head";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ApplicationShell } from "@/components/core/appshell";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Notifications } from "@mantine/notifications"
+import { Notifications } from "@mantine/notifications";
 
 const theme = createTheme({
   colors: {
@@ -52,6 +53,7 @@ export default function App({ Component, pageProps }: AppProps) {
               <Component {...pageProps} />
             </ApplicationShell>
           </ClerkProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </MantineProvider>
     </>
