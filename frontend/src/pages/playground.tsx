@@ -7,6 +7,7 @@ import { useCode } from "@/lib/data-hooks/use-code";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { useSearchParams } from "next/navigation";
 import { useDebouncedValue } from "@mantine/hooks";
+import { useChallenge } from "@/lib/data-hooks/use-challenge";
 
 interface Message {
   event: string;
@@ -15,14 +16,23 @@ interface Message {
 
 export default function Playground() {
   const searchParams = useSearchParams();
-  const { data: codeData, isLoading, isError } = useCode(1);
+  const { data: activeChallengeData } = useChallenge();
+  const {
+    data: codeData,
+    isLoading,
+    isError,
+  } = useCode(activeChallengeData?.challenge?.id ?? 0);
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
   const [showNotification, setShowNotification] = useState(true);
   const xIcon = <IconX style={{ width: rem(20), height: rem(20) }} />;
   const checkIcon = <IconCheck style={{ width: rem(20), height: rem(20) }} />;
 
+  const [isSaved, setIsSaved] = useState(false);
+
   const [value, setValue] = useState(
-    `<!doctype html>
+    !isLoading && codeData?.code?.code
+      ? codeData.code.code
+      : `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -55,6 +65,12 @@ export default function Playground() {
   });
 
   useEffect(() => {
+    if (isLoading || !codeData?.code?.code) return;
+
+    setValue(codeData.code.code);
+  }, [codeData?.code?.code]);
+
+  useEffect(() => {
     if (showNotification) {
       const timer = setTimeout(() => {
         setShowNotification(false);
@@ -64,19 +80,24 @@ export default function Playground() {
   }, [showNotification, connectionStatus]);
 
   useEffect(() => {
+    if (!activeChallengeData?.challenge?.id) return;
+
     socket?.send(
       JSON.stringify({
         event: "code:edit",
         code: {
           code: debouncedValue,
-          challengeId: 1, // TODO: get from backend
+          challengeId: activeChallengeData?.challenge?.id,
         },
       }),
     );
+
+    setIsSaved(true);
   }, [debouncedValue]);
 
   const handleChangeValue = (newValue: string | undefined) => {
     if (!newValue) return;
+    setIsSaved(false);
     setValue(newValue);
   };
 
@@ -109,6 +130,7 @@ export default function Playground() {
           {connectionStatus.message}
         </Notification>
       )}
+      {isSaved ? "changes saved!" : "saving changes"}
       <Flex justify="center" gap="md" align="center" mt="md">
         <CodeEditor
           value={value}
