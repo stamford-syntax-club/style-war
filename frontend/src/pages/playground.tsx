@@ -52,7 +52,7 @@ export default function Playground() {
   </body>
 </html>`,
   );
-  const [debouncedValue] = useDebouncedValue(value, 10000);
+  const [debouncedValue] = useDebouncedValue(value, 3000);
 
   const { socket, connectionStatus } = useSocket((message) => {
     try {
