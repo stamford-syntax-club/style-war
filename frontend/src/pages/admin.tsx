@@ -50,7 +50,7 @@ export default function AdminPage() {
         <Flex justify="space-evenly" align="center">
           <Button
             onClick={() => {
-              mutate({ id: 1, duration: 1 });
+              mutate({ id: 1, duration: 999 });
             }}
             w={165}
             size="md"

@@ -140,14 +140,18 @@ func (h *Hub) handleCodeSubmission(msg *Msg) {
 		return
 	}
 
-	// TODO: update to db
 	log.Printf("%+v\n", msg.Code)
 	h.clients[msg.Code.UserId].Conn.WriteMessage(
 		websocket.TextMessage,
 		[]byte(fmt.Sprintf("Submission from %s for challenge %d received!",
 			msg.Code.UserId,
 			msg.Code.ChallengeId)))
-	// h.codeRepo
+
+	// store code in DB
+	if _, err := h.codeRepo.StoreCode(*msg.Code); err != nil {
+		log.Printf("failed to store code: %v\n", err)
+		return
+	}
 
 	// Broadcast to admin
 	if h.admin != nil {

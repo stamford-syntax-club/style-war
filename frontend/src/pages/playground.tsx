@@ -6,6 +6,7 @@ import { useSocket } from "@/lib/websocket/ws";
 import { useCode } from "@/lib/data-hooks/use-code";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { useSearchParams } from "next/navigation";
+import { useDebouncedValue } from "@mantine/hooks";
 
 interface Message {
   event: string;
@@ -39,8 +40,9 @@ export default function Playground() {
 
 
   </body>
-</html>`
+</html>`,
   );
+  const [debouncedValue] = useDebouncedValue(value, 10000);
 
   const { socket, connectionStatus } = useSocket((message) => {
     try {
@@ -61,18 +63,20 @@ export default function Playground() {
     }
   }, [showNotification, connectionStatus]);
 
-  const handleChangeValue = (newValue: string | undefined) => {
-    if (!newValue) return;
-
+  useEffect(() => {
     socket?.send(
       JSON.stringify({
         event: "code:edit",
         code: {
-          code: newValue,
+          code: debouncedValue,
           challengeId: 1, // TODO: get from backend
         },
-      })
+      }),
     );
+  }, [debouncedValue]);
+
+  const handleChangeValue = (newValue: string | undefined) => {
+    if (!newValue) return;
     setValue(newValue);
   };
 
