@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { useSocket } from "@/lib/websocket/ws";
 import { useCode } from "@/lib/data-hooks/use-code";
 import { IconCheck, IconX } from "@tabler/icons-react";
-import { notifications } from "@mantine/notifications";
 import { useSearchParams } from "next/navigation";
 
 interface Message {
@@ -17,12 +16,7 @@ export default function Playground() {
   const searchParams = useSearchParams();
   const { data: codeData, isLoading, isError } = useCode(1);
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
-  const [isConnection, setIsConnection] = useState(true);
-  const [showNotification, setShowNotification] = useState<{
-    show: boolean;
-    message: string;
-    color: string;
-  }>({ show: true, message: "Trying to connect to backend :P", color: "none" });
+  const [showNotification, setShowNotification] = useState(true);
   const xIcon = <IconX style={{ width: rem(20), height: rem(20) }} />;
   const checkIcon = <IconCheck style={{ width: rem(20), height: rem(20) }} />;
 
@@ -45,10 +39,10 @@ export default function Playground() {
 
 
   </body>
-</html>`,
+</html>`
   );
 
-  const socket = useSocket((message) => {
+  const { socket, connectionStatus } = useSocket((message) => {
     try {
       const msg = JSON.parse(message.data) as Message;
       console.log("Received message:", msg);
@@ -58,43 +52,14 @@ export default function Playground() {
     }
   });
 
-  // TODO:  this logic can be simplified into what's shown in lib/websocket/ws.ts
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-
-    const checkConnection = () => {
-      if (socket) {
-        setShowNotification({
-          show: true,
-          message: "Connected to backend ^.^",
-          color: "green",
-        });
-        setIsConnection(false);
-      } else if (isError) {
-        setShowNotification({
-          show: true,
-          message: "Failed to connect to backend TvT",
-          color: "red",
-        });
-        setIsConnection(false);
-      }
-    };
-
-    checkConnection();
-
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [socket, isError]);
-
-  useEffect(() => {
-    if (!isConnection && showNotification.show) {
+    if (showNotification) {
       const timer = setTimeout(() => {
-        setShowNotification({ show: false, message: "", color: "none" });
+        setShowNotification(false);
       }, 5000);
       return () => clearTimeout(timer);
     }
-  }, [isConnection, showNotification.show]);
+  }, [showNotification, connectionStatus]);
 
   const handleChangeValue = (newValue: string | undefined) => {
     if (!newValue) return;
@@ -106,7 +71,7 @@ export default function Playground() {
           code: newValue,
           challengeId: 1, // TODO: get from backend
         },
-      }),
+      })
     );
     setValue(newValue);
   };
@@ -114,31 +79,20 @@ export default function Playground() {
   return (
     <Container fluid>
       {/* notification box */}
-      {showNotification.show && (
+      {showNotification && (
         <Notification
           icon={
-            isConnection ? (
+            connectionStatus.status === "Connecting" ? (
               <Loader color="blue" />
-            ) : showNotification.color === "green" ? (
+            ) : connectionStatus.color === "green" ? (
               checkIcon
             ) : (
               xIcon
             )
           }
-          color={showNotification.color}
-          title={
-            isConnection
-              ? "Connecting na! wait"
-              : showNotification.color === "green"
-                ? "Success"
-                : "Error"
-          }
-          onClose={() =>
-            setShowNotification((prev) => ({
-              ...prev,
-              show: false,
-            }))
-          }
+          color={connectionStatus.color}
+          title={connectionStatus.status}
+          onClose={() => setShowNotification(false)}
           styles={{
             root: {
               position: "fixed",
@@ -148,7 +102,7 @@ export default function Playground() {
             },
           }}
         >
-          {showNotification.message}
+          {connectionStatus.message}
         </Notification>
       )}
       <Flex justify="center" gap="md" align="center" mt="md">

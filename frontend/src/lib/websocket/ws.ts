@@ -1,5 +1,4 @@
 import { useSession } from "@clerk/nextjs";
-import { notifications } from "@mantine/notifications";
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 
 export function useSocket(
@@ -9,6 +8,12 @@ export function useSocket(
   const { session } = useSession();
   const [token, setToken] = useState("");
   const socket: MutableRefObject<WebSocket | null> = useRef(null);
+  const [connectionStatus, setConnectionStatus] = useState<{
+    show: boolean;
+    status: "Connecting" | "Success" | "Closed" | "Something went wrong";
+    message: string;
+    color: string;
+  }>({show: true, status: "Connecting", message: "Trying to connect to webSocket!", color: "none"});
 
   useEffect(() => {
     session
@@ -22,19 +27,34 @@ export function useSocket(
     const connect = () => {
       const ws = new WebSocket(`ws://localhost:8080/ws/${room}?token=${token}`);
       ws.onopen = function () {
-        // notifications.show();
+        setConnectionStatus({
+          show: true,
+          status: "Success",
+          message: "Connected to backend ^.^",
+          color: "green",
+        });
         console.log("WebSocket connection open");
         socket.current = ws;
       };
       ws.onclose = function () {
-        // notifications.show();
+        setConnectionStatus({
+          show: true,
+          status: "Closed",
+          message: "WebSocket connection is closed!",
+          color: "orange",
+        });
         console.log("WebSocket connection closed, attempting to reconnect");
         setTimeout(() => {
           connect();
         }, 3000);
       };
       ws.onerror = function (error) {
-        // notifications.show();
+        setConnectionStatus({
+          show: true,
+          status: "Something went wrong",
+          message: "Failed to connect to backend TvT",
+          color: "red",
+        });
         console.error("WebSocket error:", error);
       };
       ws.onmessage = function (message) {
@@ -50,5 +70,7 @@ export function useSocket(
     };
   }, [token]);
 
-  return useMemo(() => socket.current, [token, socket.current]);
+  return {
+    socket : useMemo(() => socket.current, [token, socket.current]), connectionStatus
+  };
 }
