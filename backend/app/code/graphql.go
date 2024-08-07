@@ -36,6 +36,8 @@ var gqlType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+var listGqlType = graphql.NewList(gqlType)
+
 func newGqlQueries(codeRepo CodeRepo) graphql.Fields {
 	codeQuery := &graphql.Field{
 		Type: gqlType,
@@ -51,8 +53,22 @@ func newGqlQueries(codeRepo CodeRepo) graphql.Fields {
 		},
 	}
 
+	codeForChallengeQuery := &graphql.Field{
+		Type: listGqlType,
+		Args: graphql.FieldConfigArgument{
+			"challenge_id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+		},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			challengeId := p.Args["challenge_id"].(int)
+			return codeRepo.GetCodesForChallenge(challengeId)
+		},
+	}
+
 	queries := map[string]*graphql.Field{
-		"code": codeQuery,
+		"code":             codeQuery,
+		"codeForChallenge": codeForChallengeQuery,
 	}
 
 	return queries

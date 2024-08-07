@@ -31,3 +31,13 @@ func (cr *CodeRepoImpl) StoreCode(newCode Code) (*Code, error) {
 
 	return &newCode, nil
 }
+
+func (cr *CodeRepoImpl) GetCodesForChallenge(challenge_id int) ([]*Code, error) {
+	var codes []*Code
+	result := cr.db.Find(&codes, "challenge_id = ?", challenge_id)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return codes, nil
+}

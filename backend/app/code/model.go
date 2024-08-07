@@ -13,4 +13,5 @@ type Code struct {
 type CodeRepo interface {
 	GetCode(int, string) (*Code, error)
 	StoreCode(Code) (*Code, error)
+	GetCodesForChallenge(int) ([]*Code, error)
 }
