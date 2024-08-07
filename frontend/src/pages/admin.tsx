@@ -1,14 +1,6 @@
 import { useSetActiveChallenge } from "@/lib/data-hooks/use-set-challenge";
 import { useSocket } from "@/lib/websocket/ws";
-import {
-  Button,
-  Container,
-  Text,
-  Flex,
-  Card,
-  Box,
-  Title
-} from "@mantine/core";
+import { Button, Container, Text, Flex, Card, Box, Title } from "@mantine/core";
 import { useState } from "react";
 
 interface Message {
@@ -46,7 +38,7 @@ export default function AdminPage() {
 
   return (
     <Container fluid>
-      <Box className="sticky top-[58px] bg-neutral-900 rounded-2xl h-16 content-center" >
+      <Box className="sticky top-[58px] bg-neutral-900 rounded-2xl h-16 content-center">
         <Flex justify="space-evenly" align="center">
           <Button
             onClick={() => {
@@ -61,7 +53,7 @@ export default function AdminPage() {
             size="32px  "
             fw={900}
             variant="gradient"
-            gradient={{ from: 'blue', to: 'cyan', deg: 140 }}
+            gradient={{ from: "blue", to: "cyan", deg: 140 }}
           >
             ADMIN PANEL
           </Text>
@@ -70,23 +62,22 @@ export default function AdminPage() {
       </Box>
       <Flex align="center" justify="center" wrap="wrap">
         {Object.entries(codes).map(([userId, code]) => (
-          <Card
-            className="flex justify-center items-center m-2 w-[700px] h-[450px] bg-neutral-900 text-white relative"
-          >
+          <Card className="flex justify-center items-center m-2 w-[700px] h-[450px] bg-neutral-900 text-white relative">
             <Text fw={500}>{userId}</Text>
             <iframe
               title="preview"
               srcDoc={code}
-              style={{ width: '100%', height: 400, border: 'none' }}
+              style={{ width: "100%", height: 400, border: "none" }}
             />
           </Card>
         ))}
       </Flex>
-    </Container >
+    </Container>
   );
 }
 
-{/* <div className="flex sticky top-14 z-10">
+{
+  /* <div className="flex sticky top-14 z-10">
         <div className=" bg-black rounded-2xl w-full h-16 content-center">
           <Grid mt={8}>
             <GridCol span={4}>
@@ -112,7 +103,8 @@ export default function AdminPage() {
             </GridCol>
           </Grid>
         </div>
-      </div> */}
+      </div> */
+}
 
 // <Grid.Col
 // span={4}
