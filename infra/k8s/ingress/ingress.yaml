@@ -29,7 +29,7 @@ spec:
       http:
         paths:
           - pathType: Prefix
-            path: "/graphql"
+            path: "/"
             backend:
               service:
                 name: be-service
@@ -39,7 +39,7 @@ spec:
       http:
         paths:
           - pathType: Prefix
-            path: "/graphql"
+            path: "/"
             backend:
               service:
                 name: be-service

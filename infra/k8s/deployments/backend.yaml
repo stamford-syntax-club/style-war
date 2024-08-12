@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: be
-          image: chinathaip/stylewars-be:woah
+          image: chinathaip/stylewars-be:12-aug
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

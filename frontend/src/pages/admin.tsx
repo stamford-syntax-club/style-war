@@ -42,7 +42,7 @@ export default function AdminPage() {
         <Flex justify="space-evenly" align="center">
           <Button
             onClick={() => {
-              mutate({ id: 1, duration: 999 });
+              mutate({ id: 1, duration: 2 });
             }}
             w={165}
             size="md"
@@ -62,7 +62,10 @@ export default function AdminPage() {
       </Box>
       <Flex align="center" justify="center" wrap="wrap">
         {Object.entries(codes).map(([userId, code]) => (
-          <Card className="flex justify-center items-center m-2 w-[700px] h-[450px] bg-neutral-900 text-white relative">
+          <Card
+            key={`${userId}-code`}
+            className="flex justify-center items-center m-2 w-[700px] h-[450px] bg-neutral-900 text-white relative"
+          >
             <Text fw={500}>{userId}</Text>
             <iframe
               title="preview"

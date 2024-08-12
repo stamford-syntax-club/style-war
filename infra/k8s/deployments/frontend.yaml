@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: fe
-          image: chinathaip/stylewars-fe:dev
+          image: chinathaip/stylewars-fe:12-aug
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
