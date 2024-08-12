@@ -50,7 +50,7 @@ export default function Playground() {
 
 
   </body>
-</html>`,
+</html>`
   );
   const [debouncedValue] = useDebouncedValue(value, 3000);
 
@@ -89,7 +89,7 @@ export default function Playground() {
           code: debouncedValue,
           challengeId: activeChallengeData?.challenge?.id,
         },
-      }),
+      })
     );
 
     setIsSaved(true);

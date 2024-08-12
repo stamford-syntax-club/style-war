@@ -1,18 +1,14 @@
 import { Box, Title, Paper, List } from "@mantine/core";
 import React from "react";
 
-
 type value = { value: (string | null)[] };
 
 export default function Obj({ value }: value) {
-
   {
     value?.map((m) => {
-      return <List.Item>{m}</List.Item>
-    })
+      return <List.Item key={`${m}`}>{m}</List.Item>;
+    });
   }
-
-
 
   return (
     <Box>
@@ -25,5 +21,3 @@ export default function Obj({ value }: value) {
     </Box>
   );
 }
-
-

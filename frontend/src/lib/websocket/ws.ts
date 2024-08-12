@@ -3,7 +3,7 @@ import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 
 export function useSocket(
   onMessage: (ev: MessageEvent<any>) => void,
-  room: string = "competition",
+  room: string = "competition"
 ) {
   const { session } = useSession();
   const [token, setToken] = useState("");
@@ -13,7 +13,12 @@ export function useSocket(
     status: "Connecting" | "Success" | "Closed" | "Something went wrong";
     message: string;
     color: string;
-  }>({show: true, status: "Connecting", message: "Trying to connect to webSocket!", color: "none"});
+  }>({
+    show: true,
+    status: "Connecting",
+    message: "Trying to connect to webSocket!",
+    color: "none",
+  });
 
   useEffect(() => {
     session
@@ -25,7 +30,10 @@ export function useSocket(
     if (!token) return;
 
     const connect = () => {
-      const ws = new WebSocket(`ws://localhost:8080/ws/${room}?token=${token}`);
+      const backendURL = new URL(process.env.NEXT_PUBLIC_BACKEND_URL || "");
+      const ws = new WebSocket(
+        `wss://${backendURL.host}/ws/${room}?token=${token}`
+      );
       ws.onopen = function () {
         setConnectionStatus({
           show: true,
@@ -59,7 +67,7 @@ export function useSocket(
       };
       ws.onmessage = function (message) {
         onMessage(message);
-        console.log("WebSocket message received:", message);
+        // console.log("WebSocket message received:", message);
       };
     };
 
@@ -71,6 +79,7 @@ export function useSocket(
   }, [token]);
 
   return {
-    socket : useMemo(() => socket.current, [token, socket.current]), connectionStatus
+    socket: useMemo(() => socket.current, [token, socket.current]),
+    connectionStatus,
   };
 }
