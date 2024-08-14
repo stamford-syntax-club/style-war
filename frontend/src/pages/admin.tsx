@@ -2,6 +2,7 @@ import { useSetActiveChallenge } from "@/lib/data-hooks/use-set-challenge";
 import { useSocket } from "@/lib/websocket/ws";
 import { Button, Container, Text, Flex, Card, Box, Title } from "@mantine/core";
 import { useState } from "react";
+import Dropdown from "@/components/tasks-dropdown";
 
 interface Message {
   event: string;
@@ -40,6 +41,7 @@ export default function AdminPage() {
     <Container fluid>
       <Box className="sticky top-[58px] bg-neutral-900 rounded-2xl h-16 content-center">
         <Flex justify="space-evenly" align="center">
+          <Dropdown />
           <Button
             onClick={() => {
               mutate({ id: 1, duration: 2 });
