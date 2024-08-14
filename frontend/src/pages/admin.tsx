@@ -49,14 +49,6 @@ export default function AdminPage() {
           >
             Start
           </Button>
-          <Text
-            size="32px  "
-            fw={900}
-            variant="gradient"
-            gradient={{ from: "blue", to: "cyan", deg: 140 }}
-          >
-            ADMIN PANEL
-          </Text>
           <Text className="text-2xl">Remaining Time: {remainingTime}</Text>
         </Flex>
       </Box>
