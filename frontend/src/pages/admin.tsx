@@ -41,17 +41,35 @@ export default function AdminPage() {
     <Container fluid>
       <Box className="sticky top-[58px] bg-neutral-900 rounded-2xl h-16 content-center">
         <Flex justify="space-evenly" align="center">
-          <Dropdown />
-          <Button
-            onClick={() => {
-              mutate({ id: 1, duration: 2 });
-            }}
-            w={165}
-            size="md"
+
+          <div className="flex flex-rows">
+            <Button
+              onClick={() => {
+                mutate({ id: 1, duration: 2 });
+              }}
+              w={64}
+              size="md"
+              mx={10}
+              radius="lg"
+            >
+              ➤
+            </Button>
+            <Dropdown />
+          </div>
+
+          <Text
+            size="32px  "
+            fw={900}
+            variant="gradient"
+            gradient={{ from: "blue", to: "cyan", deg: 140 }}
           >
-            Start
-          </Button>
-          <Text className="text-2xl">Remaining Time: {remainingTime}</Text>
+            ADMIN PANEL
+          </Text>
+
+          <div className="flex flex-rows">
+            <Text className="text-xl mr-4">Current Task: [Something]</Text>
+            <Text className="text-xl">Time left: {remainingTime}</Text>
+          </div>
         </Flex>
       </Box>
       <Flex align="center" justify="center" wrap="wrap">

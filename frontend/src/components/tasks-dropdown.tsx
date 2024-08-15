@@ -13,7 +13,7 @@ const Dropdown = () => {
             <button
                 id="dropdownButton"
                 onClick={toggleDropdown}
-                className="z-50 text-white bg-[#1971c2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm px-5 py-2.5 text-center inline-flex items-center dark:[#1971c2] dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                className="h-10 z-50 px-8 py-[21px] text-white bg-[#1971c2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm text-center inline-flex items-center dark:[#1971c2] dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 type="button"
             >
                 Select a tasks
