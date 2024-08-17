@@ -3,7 +3,7 @@ import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 
 export function useSocket(
   onMessage: (ev: MessageEvent<any>) => void,
-  room: string = "competition"
+  room: string = "competition",
 ) {
   const { session } = useSession();
   const [token, setToken] = useState("");
@@ -32,7 +32,7 @@ export function useSocket(
     const connect = () => {
       const backendURL = new URL(process.env.NEXT_PUBLIC_BACKEND_URL || "");
       const ws = new WebSocket(
-        `wss://${backendURL.host}/ws/${room}?token=${token}`
+        `${backendURL.protocol === "http:" ? "ws" : "wss"}://${backendURL.host}/ws/${room}?token=${token}`,
       );
       ws.onopen = function () {
         setConnectionStatus({
