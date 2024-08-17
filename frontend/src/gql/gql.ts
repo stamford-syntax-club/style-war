@@ -13,6 +13,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
+    "\n  query AllChallenge {\n    allChallenge {\n      id\n      imageUrl\n      isActive\n      objectives\n    }\n  }\n": types.AllChallengeDocument,
+    "\n  query CodeForChallenge($challengeId: Int!) {\n    codeForChallenge(challenge_id: $challengeId) {\n      id\n      code\n      challengeId\n      userId\n    }\n  }\n": types.CodeForChallengeDocument,
     "\n  query Challenge {\n    challenge {\n      id\n      imageUrl\n      isActive\n      objectives\n    }\n  }\n": types.ChallengeDocument,
     "\n  query Code($challengeId: Int!) {\n    code(challenge_id: $challengeId) {\n      id\n      code\n      challengeId\n      userId\n    }\n  }\n": types.CodeDocument,
     "\n  mutation SetActiveChallenge(\n    $setActiveChallengeInput: SetActiveChallengeInput!\n  ) {\n    setActiveChallenge(setActiveChallengeInput: $setActiveChallengeInput) {\n      id\n    }\n  }\n": types.SetActiveChallengeDocument,
@@ -32,6 +34,14 @@ const documents = {
  */
 export function graphql(source: string): unknown;
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query AllChallenge {\n    allChallenge {\n      id\n      imageUrl\n      isActive\n      objectives\n    }\n  }\n"): (typeof documents)["\n  query AllChallenge {\n    allChallenge {\n      id\n      imageUrl\n      isActive\n      objectives\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query CodeForChallenge($challengeId: Int!) {\n    codeForChallenge(challenge_id: $challengeId) {\n      id\n      code\n      challengeId\n      userId\n    }\n  }\n"): (typeof documents)["\n  query CodeForChallenge($challengeId: Int!) {\n    codeForChallenge(challenge_id: $challengeId) {\n      id\n      code\n      challengeId\n      userId\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
