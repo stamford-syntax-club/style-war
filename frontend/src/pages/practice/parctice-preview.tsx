@@ -10,17 +10,17 @@ interface PracticePreviewProps {
 export default function PracticePreview({ value }: PracticePreviewProps) {
   const [debouncedValue] = useDebouncedValue(value, 1000);
   const {
-		data: challengeData,
-		isLoading: loadingChallnge,
-		isError: errorChallenge,
-	} = useChallenge();
+    data: challengeData,
+    isLoading: loadingChallnge,
+    isError: errorChallenge,
+  } = useChallenge();
 
   return (
     <Box className="min-w-[40%]">
       <Flex direction="row">
         <Title>Preview</Title>
         <Challenge
-          objectives={challengeData?.challenge?.objectives ?? [""]}
+          objectives={challengeData?.challenge?.objectives ?? ["No objectives"]}
           isActive={challengeData?.challenge?.isActive ?? true}
           imageUrl={challengeData?.challenge?.imageUrl ?? ""}
         />

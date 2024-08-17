@@ -22,7 +22,7 @@ export default function Challenge({ objectives, imageUrl, isActive }: challenge)
           size="100%"
         >
           <Flex justify="center" gap="md" align="center" mt="md">
-            <Obj value={objectives ?? [""]} />
+            <Obj value={objectives ?? ["no objective"]} />
             <Ref img={imageUrl} closeButton={close} />
           </Flex>
         </Modal>
