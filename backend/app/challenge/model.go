@@ -19,4 +19,5 @@ type Challenge struct {
 type ChallengeRepo interface {
 	GetActiveChallenge() (*Challenge, error)
 	GetAllChallenges(...string) ([]Challenge, error)
+	SetActiveChallenge(int)
 }

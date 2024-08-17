@@ -92,6 +92,7 @@ func newGqlMutations(challengeRepo ChallengeRepo, timerCh chan Challenge) graphq
 			duration := input["duration"].(int)
 
 			// TODO: update active challenge in db
+			challengeRepo.SetActiveChallenge(id)
 
 			// start the timer
 			// extra 15 seconds to prevent the case where client's code update interval came after the expiration

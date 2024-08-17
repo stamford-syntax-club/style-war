@@ -30,3 +30,18 @@ func (chr *ChallengeRepoImpl) GetAllChallenges(fields ...string) ([]Challenge, e
 
 	return challenges, nil
 }
+
+func (chr *ChallengeRepoImpl) SetActiveChallenge(id int) {
+	/*
+	   UPDATE challenges
+	   SET is_active = FALSE
+	   WHERE is_active = TRUE;
+
+	   UPDATE challenges
+	   SET is_active = TRUE
+	   WHERE "id" = 2;
+	*/
+
+	chr.db.Exec("UPDATE challenges SET is_active = FALSE WHERE is_active = TRUE")
+	chr.db.Exec("UPDATE challenges SET is_active = TRUE WHERE id = ?", id)
+}
