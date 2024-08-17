@@ -50,8 +50,16 @@ func newGqlQueries(challengeRepo ChallengeRepo) graphql.Fields {
 		},
 	}
 
+	allChallengeQuery := &graphql.Field{
+		Type: &graphql.List{OfType: gqlType},
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			return challengeRepo.GetAllChallenges()
+		},
+	}
+
 	queries := map[string]*graphql.Field{
-		"challenge": challengeQuery,
+		"allChallenge": allChallengeQuery,
+		"challenge":    challengeQuery,
 	}
 
 	return queries
