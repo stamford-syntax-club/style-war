@@ -2,7 +2,7 @@ import { useSetActiveChallenge } from "@/lib/data-hooks/use-set-challenge";
 import { useSocket } from "@/lib/websocket/ws";
 import { Button, Container, Text, Flex, Card, Box, Title } from "@mantine/core";
 import { useState } from "react";
-import Dropdown from "@/components/tasks-dropdown";
+import TasksDropdown from "@/components/admin/tasks_dropdown";
 
 interface Message {
   event: string;
@@ -47,14 +47,15 @@ export default function AdminPage() {
               onClick={() => {
                 mutate({ id: 1, duration: 2 });
               }}
-              w={64}
-              size="md"
+              w={42}
+              h={42}
+              radius="md"
               mx={10}
-              radius="lg"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} // center content
             >
               ➤
             </Button>
-            <Dropdown />
+            <TasksDropdown />
           </div>
 
           <Text
