@@ -3,6 +3,7 @@ import { useSocket } from "@/lib/websocket/ws";
 import { Button, Container, Text, Flex, Card, Box, Title } from "@mantine/core";
 import { useState } from "react";
 import TasksDropdown from "@/components/admin/tasks_dropdown";
+import SelectTimer from "@/components/admin/select_timer";
 
 interface Message {
   event: string;
@@ -56,6 +57,7 @@ export default function AdminPage() {
               ➤
             </Button>
             <TasksDropdown />
+            <SelectTimer />
           </div>
 
           <Text
