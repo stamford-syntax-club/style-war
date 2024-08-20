@@ -1,4 +1,11 @@
-import { Container, Flex, Notification, rem, Loader } from "@mantine/core";
+import {
+  Container,
+  Flex,
+  Notification,
+  rem,
+  Loader,
+  Title,
+} from "@mantine/core";
 import CodeEditor from "@/components/code-editor";
 import Preview from "@/components/preview";
 import { useEffect, useState } from "react";
@@ -9,6 +16,7 @@ import { useSearchParams } from "next/navigation";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useChallenge } from "@/lib/data-hooks/use-challenge";
 import { notifications } from "@mantine/notifications";
+import Challenge from "./challenge";
 
 interface Message {
   event: string;
@@ -95,9 +103,25 @@ export default function Playground() {
   };
 
   return (
-    <Container fluid>
-      {isSaved ? "changes saved!" : "saving changes"}
-      <Flex justify="center" gap="md" align="center" mt="md">
+    <Flex direction="column" justify="center" align="center" gap="lg">
+      <Title order={4} className="text-gray-400">
+        {remainingTime === 0
+          ? "Time's up!"
+          : remainingTime !== null
+          ? `Remaining Time: ${remainingTime}s`
+          : "Waiting for admin to start next challenge..."}
+      </Title>
+
+      <Flex justify="center" gap="md" align="center" mb="mb">
+        <Challenge
+          objectives={activeChallengeData?.challenge?.objectives ?? [""]}
+          isActive={activeChallengeData?.challenge?.isActive ?? true}
+          imageUrl={activeChallengeData?.challenge?.imageUrl ?? ""}
+        />
+        {isSaved ? "changes saved!" : "saving changes"}
+      </Flex>
+
+      <Flex justify="center" gap="md" align="center">
         <CodeEditor
           value={value}
           onChange={handleChangeValue}
@@ -107,6 +131,6 @@ export default function Playground() {
         />
         <Preview value={value} />
       </Flex>
-    </Container>
+    </Flex>
   );
 }

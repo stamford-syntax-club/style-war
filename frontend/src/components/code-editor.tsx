@@ -26,16 +26,7 @@ export default function CodeEditor({
 
   return (
     <Box>
-      <Flex dir="row" justify="space-between" align="center">
-        <Title>Code Editor</Title>
-        <Title order={4} className="text-gray-400">
-          {remainingTime === 0
-            ? "Time's up!"
-            : remainingTime !== null
-            ? `Remaining Time: ${remainingTime}s`
-            : "Waiting for players ..."}
-        </Title>
-      </Flex>
+      <Flex dir="row" justify="space-between" align="center"></Flex>
       {clerk.loaded && (
         <Editor
           className="border border-gray-600 rounded p-1 "
