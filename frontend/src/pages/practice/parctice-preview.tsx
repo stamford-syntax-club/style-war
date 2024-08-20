@@ -8,7 +8,6 @@ interface PracticePreviewProps {
 }
 
 export default function PracticePreview({ value }: PracticePreviewProps) {
-  const [debouncedValue] = useDebouncedValue(value, 1000);
   const {
     data: challengeData,
     isLoading: loadingChallnge,
@@ -18,7 +17,6 @@ export default function PracticePreview({ value }: PracticePreviewProps) {
   return (
     <Box className="min-w-[40%]">
       <Flex direction="row">
-        <Title>Preview</Title>
         <Challenge
           objectives={challengeData?.challenge?.objectives ?? ["No objectives"]}
           isActive={challengeData?.challenge?.isActive ?? true}
@@ -28,7 +26,7 @@ export default function PracticePreview({ value }: PracticePreviewProps) {
       <Paper className="min-h-[80vh] border bg-neutral-900 p-1 overflow-hidden">
         <iframe
           title="preview"
-          srcDoc={debouncedValue}
+          srcDoc={value}
           className="w-full min-h-[80vh] border-none"
         />
       </Paper>

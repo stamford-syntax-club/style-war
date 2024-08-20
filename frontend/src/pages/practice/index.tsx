@@ -5,9 +5,9 @@ import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 
 export default function PracticePlayground() {
-  const [opened, {open, close}] = useDisclosure(true);
+  const [opened, { open, close }] = useDisclosure(true);
   const [value, setValue] = useState(
-`<!doctype html>
+    `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -36,17 +36,19 @@ export default function PracticePlayground() {
 
   return (
     <Container fluid>
-      <Modal title="Practice Playground" opened={opened} onClose={close} centered>
+      <Modal
+        title="Practice Playground"
+        opened={opened}
+        onClose={close}
+        centered
+      >
         <Text>
-            This is a practice playground where you get familiar with the platform before the compition. Blah Blah Blah 
+          This is a practice playground where you get familiar with the platform
+          before the competition.
         </Text>
       </Modal>
       <Flex justify="center" gap="md" align="center" mt="md">
-        <CodeEditor
-          value={value}
-          onChange={handleChangeValue}
-          timeDuration={10}
-        />
+        <CodeEditor value={value} onChange={handleChangeValue} />
         <Preview value={value} />
       </Flex>
     </Container>
