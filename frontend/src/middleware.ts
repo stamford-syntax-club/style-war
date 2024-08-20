@@ -1,6 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isProtectedRoute = createRouteMatcher(["/playground"]);
+const isProtectedRoute = createRouteMatcher(["/competition"]);
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 
 export default clerkMiddleware(
@@ -15,7 +15,7 @@ export default clerkMiddleware(
       auth().protect();
     }
   },
-  { debug: true },
+  { debug: true }
 );
 
 export const config = {
