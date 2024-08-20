@@ -8,6 +8,7 @@ import { IconCheck, IconX } from "@tabler/icons-react";
 import { useSearchParams } from "next/navigation";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useChallenge } from "@/lib/data-hooks/use-challenge";
+import { notifications } from "@mantine/notifications";
 
 interface Message {
   event: string;
@@ -23,9 +24,6 @@ export default function Playground() {
     isError,
   } = useCode(activeChallengeData?.challenge?.id ?? 0);
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
-  const [showNotification, setShowNotification] = useState(true);
-  const xIcon = <IconX style={{ width: rem(20), height: rem(20) }} />;
-  const checkIcon = <IconCheck style={{ width: rem(20), height: rem(20) }} />;
 
   const [isSaved, setIsSaved] = useState(false);
 
@@ -54,7 +52,7 @@ export default function Playground() {
   );
   const [debouncedValue] = useDebouncedValue(value, 3000);
 
-  const { socket, connectionStatus } = useSocket((message) => {
+  const { socket } = useSocket((message) => {
     try {
       const msg = JSON.parse(message.data) as Message;
       console.log("Received message:", msg);
@@ -66,18 +64,13 @@ export default function Playground() {
 
   useEffect(() => {
     if (isLoading || !codeData?.code?.code) return;
+    notifications.show({
+      title: "yay",
+      message: "hi",
+    });
 
     setValue(codeData.code.code);
   }, [codeData?.code?.code]);
-
-  useEffect(() => {
-    if (showNotification) {
-      const timer = setTimeout(() => {
-        setShowNotification(false);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [showNotification, connectionStatus]);
 
   useEffect(() => {
     if (!activeChallengeData?.challenge?.id) return;
@@ -103,33 +96,6 @@ export default function Playground() {
 
   return (
     <Container fluid>
-      {/* notification box */}
-      {showNotification && (
-        <Notification
-          icon={
-            connectionStatus.status === "Connecting" ? (
-              <Loader color="blue" />
-            ) : connectionStatus.color === "green" ? (
-              checkIcon
-            ) : (
-              xIcon
-            )
-          }
-          color={connectionStatus.color}
-          title={connectionStatus.status}
-          onClose={() => setShowNotification(false)}
-          styles={{
-            root: {
-              position: "fixed",
-              bottom: rem(16),
-              right: rem(16),
-              zIndex: 1000,
-            },
-          }}
-        >
-          {connectionStatus.message}
-        </Notification>
-      )}
       {isSaved ? "changes saved!" : "saving changes"}
       <Flex justify="center" gap="md" align="center" mt="md">
         <CodeEditor
