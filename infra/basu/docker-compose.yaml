@@ -23,7 +23,7 @@ services:
       - style-wars
 
   frontend:
-    image: chinathaip/stylewars-fe:17-aug
+    image: chinathaip/stylewars-fe:21-aug
     ports:
       - "3000:3000"
     environment:
