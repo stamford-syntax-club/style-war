@@ -24,8 +24,8 @@ export function ApplicationShell({
           <Link href="/">
             <Title order={3}>STYLE WARS</Title>
           </Link>
-          <Link href="/playground">
-            <Text tt="uppercase">code</Text>
+          <Link href="/competition">
+            <Text tt="uppercase">competition</Text>
           </Link>
           <SignedIn>
             <UserButton />

@@ -8,7 +8,7 @@ export default function Home() {
         <Link href="/practice">
           <Button variant="default">Practice Offline</Button>
         </Link>
-        <Link href="/playground">
+        <Link href="/competition">
           <Button>Enter Competition</Button>
         </Link>
       </Flex>
