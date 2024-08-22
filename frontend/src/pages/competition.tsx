@@ -61,7 +61,7 @@ export default function Playground() {
   };
 
   const [value, setValue] = useState(cssOptions(cssType));
-  const [debouncedValue] = useDebouncedValue(value, 3000);
+  const [debouncedValue] = useDebouncedValue(value, 1000);
 
   const { socket } = useSocket((message) => {
     try {
