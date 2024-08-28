@@ -12,6 +12,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 
 	"github.com/stamford-syntax-club/style-war/backend/app/challenge"
 	"github.com/stamford-syntax-club/style-war/backend/app/code"
@@ -43,15 +44,23 @@ func main() {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Bangkok",
 		os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"), os.Getenv("DB_PORT"))
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-		DryRun: false, // "true" for test sql statement (not effect to database)
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix: "stylewars.",
+		},
+		Logger:      logger.Default.LogMode(logger.Info),
+		DryRun:      false, // "true" for test sql statement (not effect to database)
+		PrepareStmt: false,
 	})
 	if err != nil {
 		log.Fatalln("failed to connect database: " + err.Error())
 	}
-
-	db.AutoMigrate(challenge.Challenge{})
-	db.AutoMigrate(code.Code{})
+	db.Exec("DEALLOCATE ALL")
+	if err := db.AutoMigrate(&challenge.Challenge{}); err != nil {
+		log.Println("failed to migrate challenge table: " + err.Error())
+	}
+	if err := db.AutoMigrate(&code.Code{}); err != nil {
+		log.Println("failed to migrate code table: " + err.Error())
+	}
 
 	// Repositories
 	challengeRepo := challenge.NewChallengeRepoImpl(db)
