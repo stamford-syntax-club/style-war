@@ -1,0 +1,11 @@
+{
+  "name": "loadtest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test-websocket.js",
+  "scripts": {
+    "loadtest-ws": "k6 run --vus 30 --duration 15m test-websocket.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
