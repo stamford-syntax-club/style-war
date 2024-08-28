@@ -1,17 +1,9 @@
-import {
-  Container,
-  Flex,
-  Notification,
-  rem,
-  Loader,
-  Title,
-} from "@mantine/core";
+import { Flex, Title, Select } from "@mantine/core";
 import CodeEditor from "@/components/code-editor";
 import Preview from "@/components/preview";
 import { useEffect, useState } from "react";
 import { useSocket } from "@/lib/websocket/ws";
 import { useCode } from "@/lib/data-hooks/use-code";
-import { IconCheck, IconX } from "@tabler/icons-react";
 import { useSearchParams } from "next/navigation";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useChallenge } from "@/lib/data-hooks/use-challenge";
@@ -31,34 +23,45 @@ export default function Playground() {
     isLoading,
     isError,
   } = useCode(activeChallengeData?.challenge?.id ?? 0);
+
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
-
   const [isSaved, setIsSaved] = useState(false);
+  const [cssType, setCssType] = useState<string>("normal");
 
-  const [value, setValue] = useState(
-    !isLoading && codeData?.code?.code
-      ? codeData.code.code
-      : `<!doctype html>
+  const cssOptions = (cssType: string) => {
+    let cdn = "";
+
+    switch (cssType) {
+      case "tailwind":
+        cdn = `<script src="https://cdn.tailwindcss.com"></script>`;
+        break;
+      case "bootstrap":
+        cdn = `<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">`;
+        break;
+      default:
+        break;
+    }
+
+    return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    ${cdn}
     <style>
-        // Add your custom styles here
+        /* Add your custom styles here */
     </style>
   </head>
   <body>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> -->
-    <!-- DO NOT REMOVE this line -->
-    <h1> Edit your code here </h1>
-    <p> Uncomment the script tags to use bootstrap & tailwind</p>
-
+    <h1>Edit your code here</h1>
+    <p>Choose the type of css you want to use from the dropdown above</p>
+    <p>Good Luck! Have Fun 🚀</p>
   </body>
-</html>`
-  );
-  const [debouncedValue] = useDebouncedValue(value, 3000);
+</html>`;
+  };
+
+  const [value, setValue] = useState(cssOptions(cssType));
+  const [debouncedValue] = useDebouncedValue(value, 1000);
 
   const { socket } = useSocket((message) => {
     try {
@@ -72,9 +75,10 @@ export default function Playground() {
 
   useEffect(() => {
     if (isLoading || !codeData?.code?.code) return;
+
     notifications.show({
-      title: "yay",
-      message: "hi",
+      title: "Code Loaded",
+      message: "Your code has been loaded successfully.",
     });
 
     setValue(codeData.code.code);
@@ -96,6 +100,11 @@ export default function Playground() {
     setIsSaved(true);
   }, [debouncedValue]);
 
+  useEffect(() => {
+    setValue(cssOptions(cssType));
+    setIsSaved(false);
+  }, [cssType]);
+
   const handleChangeValue = (newValue: string | undefined) => {
     if (!newValue) return;
     setIsSaved(false);
@@ -103,7 +112,7 @@ export default function Playground() {
   };
 
   return (
-    <Flex direction="column" justify="center" align="center" gap="lg">
+    <Flex direction="column" justify="center" align="center">
       <Title order={4} className="text-gray-400">
         {remainingTime === 0
           ? "Time's up!"
@@ -112,13 +121,25 @@ export default function Playground() {
           : "Waiting for admin to start next challenge..."}
       </Title>
 
-      <Flex justify="center" gap="md" align="center" mb="mb">
+      <Flex justify="center" gap="md" align="center" w="80%">
+        <Select
+          label="Choose CSS type"
+          className="justify-self-start"
+          value={cssType}
+          onChange={(value) => setCssType(value || "normal")}
+          data={[
+            { value: "normal", label: "Normal CSS" },
+            { value: "tailwind", label: "Tailwind CSS" },
+            { value: "bootstrap", label: "Bootstrap CSS" },
+          ]}
+          mb="md"
+        />
+        {isSaved ? "Changes saved!" : "Saving changes..."}
         <Challenge
           objectives={activeChallengeData?.challenge?.objectives ?? [""]}
           isActive={activeChallengeData?.challenge?.isActive ?? true}
           imageUrl={activeChallengeData?.challenge?.imageUrl ?? ""}
         />
-        {isSaved ? "changes saved!" : "saving changes"}
       </Flex>
 
       <Flex justify="center" gap="md" align="center">

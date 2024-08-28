@@ -1,0 +1,52 @@
+version: "3.8"
+networks:
+  style-wars:
+
+services:
+  postgres:
+    image: postgres
+    volumes:
+      - ./database:/var/lib/postgresql
+    container_name: stylewars_db
+    environment:
+      POSTGRES_DB: stylewars-dev
+      POSTGRES_USER: syntax
+      POSTGRES_PASSWORD: stamford
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    networks:
+      - style-wars
+
+  frontend:
+    image: chinathaip/stylewars-fe:21-aug
+    ports:
+      - "3000:3000"
+    environment:
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+      - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      - NEXT_PUBLIC_CLERK_SIGN_IN_URL=${NEXT_PUBLIC_CLERK_SIGN_IN_URL}
+      - NEXT_PUBLIC_CLERK_SIGN_UP_URL=${NEXT_PUBLIC_CLERK_SIGN_UP_URL}
+      - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+    networks:
+      - style-wars
+    restart: always
+
+  backend:
+    image: chinathaip/stylewars-be:17-aug
+    ports:
+      - "8080:8080"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT}
+    networks:
+      - style-wars
+    restart: always
