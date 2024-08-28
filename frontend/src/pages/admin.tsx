@@ -1,6 +1,6 @@
 import { useSetActiveChallenge } from "@/lib/data-hooks/use-set-challenge";
 import { useSocket } from "@/lib/websocket/ws";
-import { Button, Container, Text, Flex, Card, Box, Title } from "@mantine/core";
+import { Button, Container, Text, Flex, Card, Box } from "@mantine/core";
 import { useState } from "react";
 import TasksDropdown from "@/components/admin/tasks_dropdown";
 import SelectTimer from "@/components/admin/select_timer";
@@ -14,13 +14,14 @@ interface Message {
 export default function AdminPage() {
   const [codes, setCodes] = useState<Record<string, string>>({});
   const [remainingTime, setRemainingTime] = useState(0);
+  const [viewModes, setViewModes] = useState<Record<string, "rendered" | "source">>({});
   const { mutate } = useSetActiveChallenge();
 
   useSocket((message) => {
     try {
       const msg = JSON.parse(message.data) as Message;
       if (msg.event === "timer:status") {
-        console.log("remaning time", msg.remainingTime);
+        console.log("remaining time", msg.remainingTime);
         setRemainingTime(msg.remainingTime);
       }
 
@@ -38,11 +39,17 @@ export default function AdminPage() {
     }
   }, "admin");
 
+  const toggleViewMode = (userId: string) => {
+    setViewModes((prev) => ({
+      ...prev,
+      [userId]: prev[userId] === "rendered" ? "source" : "rendered",
+    }));
+  };
+
   return (
     <Container fluid>
       <Box className="sticky top-[58px] bg-neutral-900 rounded-2xl h-16 content-center">
         <Flex justify="space-evenly" align="center">
-
           <div className="flex flex-rows">
             <Button
               onClick={() => {
@@ -52,7 +59,7 @@ export default function AdminPage() {
               h={42}
               radius="md"
               mx={10}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} // center content
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               ➤
             </Button>
@@ -61,7 +68,7 @@ export default function AdminPage() {
           </div>
 
           <Text
-            size="32px  "
+            size="32px"
             fw={900}
             variant="gradient"
             gradient={{ from: "blue", to: "cyan", deg: 140 }}
@@ -82,17 +89,32 @@ export default function AdminPage() {
             className="flex justify-center items-center m-2 w-[700px] h-[450px] bg-neutral-900 text-white relative"
           >
             <Text fw={500}>{userId}</Text>
-            <iframe
-              title="preview"
-              srcDoc={code}
-              style={{ width: "100%", height: 400, border: "none" }}
-            />
+            <Button
+              onClick={() => toggleViewMode(userId)}
+              className="absolute top-2 right-4 h-[30px] w-[120px]"
+            >
+              Source Code
+            </Button>
+            {viewModes[userId] === "source" ? (
+              <textarea
+                value={code}
+                readOnly
+                style={{ width: "100%", height: 400, border: "none", backgroundColor: "#282c34", color: "white" }}
+              />
+            ) : (
+              <iframe
+                title="preview"
+                srcDoc={code}
+                style={{ width: "100%", height: 400, border: "none" }}
+              />
+            )}
           </Card>
         ))}
       </Flex>
     </Container>
   );
 }
+
 
 {
   /* <div className="flex sticky top-14 z-10">
