@@ -1,3 +1,4 @@
+import Preview from "@/components/preview";
 import { useAllChallenge } from "@/lib/data-hooks/use-all-challenge";
 import { useCodeForChallenge } from "@/lib/data-hooks/use-all-code-for-challenge";
 import { Flex, Card, Text, Select } from "@mantine/core";
@@ -39,14 +40,10 @@ export default function AdminJudgingPage() {
           {codeForChallengeData?.codeForChallenge?.map((code) => (
             <Card
               key={`${code?.userId}-code`}
-              className="flex justify-center items-center m-2 w-[700px] h-[450px] bg-neutral-900 text-white relative"
+              className="justify-center items-center m-2 bg-neutral-900 text-white relative"
             >
               <Text fw={500}>{code?.userId}</Text>
-              <iframe
-                title="preview"
-                srcDoc={code?.code || ""}
-                style={{ width: "100%", height: 400, border: "none" }}
-              />
+              <Preview value={code?.code || ""} />
             </Card>
           ))}
         </Flex>

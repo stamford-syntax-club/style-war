@@ -1,9 +1,20 @@
 import { useSetActiveChallenge } from "@/lib/data-hooks/use-set-challenge";
 import { useSocket } from "@/lib/websocket/ws";
-import { Button, Container, Text, Flex, Card, Box } from "@mantine/core";
+import {
+  Button,
+  Container,
+  Text,
+  Flex,
+  Card,
+  Box,
+  Modal,
+  Code,
+} from "@mantine/core";
 import { useState } from "react";
 import TasksDropdown from "@/components/admin/tasks_dropdown";
 import SelectTimer from "@/components/admin/select_timer";
+import Preview from "@/components/preview";
+import { useDisclosure } from "@mantine/hooks";
 
 interface Message {
   event: string;
@@ -14,8 +25,10 @@ interface Message {
 export default function AdminPage() {
   const [codes, setCodes] = useState<Record<string, string>>({});
   const [remainingTime, setRemainingTime] = useState(0);
-  const [viewModes, setViewModes] = useState<Record<string, "rendered" | "source">>({});
   const { mutate } = useSetActiveChallenge();
+
+  const [opened, { open, close }] = useDisclosure(false);
+  const [currentSourceCode, setCurrentSourceCode] = useState("");
 
   useSocket((message) => {
     try {
@@ -39,13 +52,6 @@ export default function AdminPage() {
     }
   }, "admin");
 
-  const toggleViewMode = (userId: string) => {
-    setViewModes((prev) => ({
-      ...prev,
-      [userId]: prev[userId] === "rendered" ? "source" : "rendered",
-    }));
-  };
-
   return (
     <Container fluid>
       <Box className="sticky top-[58px] bg-neutral-900 rounded-2xl h-16 content-center">
@@ -59,7 +65,11 @@ export default function AdminPage() {
               h={42}
               radius="md"
               mx={10}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
               ➤
             </Button>
@@ -84,37 +94,33 @@ export default function AdminPage() {
       </Box>
       <Flex align="center" justify="center" wrap="wrap">
         {Object.entries(codes).map(([userId, code]) => (
-          <Card
-            key={`${userId}-code`}
-            className="flex justify-center items-center m-2 w-[700px] h-[450px] bg-neutral-900 text-white relative"
-          >
+          <Card key={`${userId}-code`}>
             <Text fw={500}>{userId}</Text>
             <Button
-              onClick={() => toggleViewMode(userId)}
+              onClick={() => {
+                setCurrentSourceCode(userId);
+                open();
+              }}
               className="absolute top-2 right-4 h-[30px] w-[120px]"
             >
-              Source Code
+              Source
             </Button>
-            {viewModes[userId] === "source" ? (
-              <textarea
-                value={code}
-                readOnly
-                style={{ width: "100%", height: 400, border: "none", backgroundColor: "#282c34", color: "white" }}
-              />
-            ) : (
-              <iframe
-                title="preview"
-                srcDoc={code}
-                style={{ width: "100%", height: 400, border: "none" }}
-              />
-            )}
+            <Modal
+              size="xl"
+              opened={opened}
+              onClose={close}
+              title={`Source code: ${currentSourceCode}`}
+            >
+              <Code block> {code}</Code>
+            </Modal>
+
+            <Preview value={code} />
           </Card>
         ))}
       </Flex>
     </Container>
   );
 }
-
 
 {
   /* <div className="flex sticky top-14 z-10">

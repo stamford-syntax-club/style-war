@@ -2,18 +2,23 @@ import React from "react";
 import Image from "next/image";
 import { Flex, Box, Title, Button, Stack } from "@mantine/core";
 
-type type = { img: string, closeButton: () => void };
+type type = { img: string };
 
-
-export default function Ref({ img, closeButton }: type) {
+export default function Ref({ img }: type) {
   return (
-    <Box className="min-w-[40%]">
+    <Box className="w-[540px] h-[720px]">
       <Flex direction="row" justify="space-between">
-        <Title>Reference</Title>
-        <Button onClick={closeButton}>Close</Button>
+        <Title order={3}>Reference</Title>
       </Flex>
-      <Stack className="min-h-[80vh] border bg-neutral-900 p-1 overflow-hidden h-[100%] relative">
-        <Image src={img} sizes="100vw" alt="Picture of the author" fill objectFit="cover" quality={100} />
+      <Stack className="border bg-neutral-900 p-1 overflow-hidden w-[100%] h-[100%] relative">
+        <Image
+          src={img}
+          sizes="100vw"
+          alt="Picture of the author"
+          fill
+          objectFit="cover"
+          quality={100}
+        />
       </Stack>
     </Box>
   );

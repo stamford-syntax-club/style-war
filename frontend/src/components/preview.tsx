@@ -1,20 +1,17 @@
-import { List, Paper, Title, Box, Flex } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
-import { useChallenge } from "@/lib/data-hooks/use-challenge";
-import Challenge from "@/pages/challenge";
-
+import { Paper, Box, Text } from "@mantine/core";
 interface PreviewProps {
   value: string;
 }
 
 export default function Preview({ value }: PreviewProps) {
   return (
-    <Box className="min-w-[40%]">
-      <Paper className="min-h-[80vh] border bg-neutral-900 p-1 overflow-hidden">
+    <Box>
+      <Paper className=" w-[540px] h-[720px] border bg-neutral-900 p-1 overflow-hidden">
+        <Text ta="center"> 540x720px</Text>
         <iframe
           title="preview"
           srcDoc={value}
-          className="w-full min-h-[80vh] border-none"
+          className="w-full h-full  border-none"
         />
       </Paper>
     </Box>

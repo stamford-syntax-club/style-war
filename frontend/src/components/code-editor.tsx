@@ -31,7 +31,7 @@ export default function CodeEditor({
         <Editor
           className="border border-gray-600 rounded p-1 "
           height="80vh"
-          width="50vw"
+          width="60vw"
           defaultLanguage="html"
           language="html, css"
           defaultValue=""
