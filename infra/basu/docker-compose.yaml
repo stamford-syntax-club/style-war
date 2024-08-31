@@ -21,6 +21,7 @@ services:
       - "5432:5432"
     networks:
       - style-wars
+    restart: always
 
   frontend:
     image: chinathaip/stylewars-fe:21-aug
