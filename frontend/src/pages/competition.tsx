@@ -1,11 +1,11 @@
-import { Flex, Title, Select } from "@mantine/core";
+import { Flex, Title, Select, Modal, Text, Button } from "@mantine/core";
 import CodeEditor from "@/components/code-editor";
 import Preview from "@/components/preview";
 import { useEffect, useState } from "react";
 import { useSocket } from "@/lib/websocket/ws";
 import { useCode } from "@/lib/data-hooks/use-code";
 import { useSearchParams } from "next/navigation";
-import { useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useChallenge } from "@/lib/data-hooks/use-challenge";
 import { notifications } from "@mantine/notifications";
 import Challenge from "./challenge";
@@ -27,6 +27,7 @@ export default function Playground() {
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [cssType, setCssType] = useState<string>("normal");
+  const [pendingCSSType, setPendingCSSType] = useState("");
 
   const cssOptions = (cssType: string) => {
     let cdn = "";
@@ -61,7 +62,9 @@ export default function Playground() {
   };
 
   const [value, setValue] = useState(cssOptions(cssType));
-  const [debouncedValue] = useDebouncedValue(value, 3000);
+  const [debouncedValue] = useDebouncedValue(value, 1000);
+
+  const [opened, { open, close }] = useDisclosure();
 
   const { socket } = useSocket((message) => {
     try {
@@ -94,7 +97,7 @@ export default function Playground() {
           code: debouncedValue,
           challengeId: activeChallengeData?.challenge?.id,
         },
-      })
+      }),
     );
 
     setIsSaved(true);
@@ -112,37 +115,66 @@ export default function Playground() {
   };
 
   return (
-    <Flex direction="column" justify="center" align="center">
+    <Flex direction="column">
       <Title order={4} className="text-gray-400">
         {remainingTime === 0
           ? "Time's up!"
           : remainingTime !== null
-          ? `Remaining Time: ${remainingTime}s`
-          : "Waiting for admin to start next challenge..."}
+            ? `Remaining Time: ${remainingTime}s`
+            : "Waiting for admin to start next challenge..."}
       </Title>
 
-      <Flex justify="center" gap="md" align="center" w="80%">
+      <Flex align="end" direction="row" gap="md" mb="md">
         <Select
           label="Choose CSS type"
-          className="justify-self-start"
           value={cssType}
-          onChange={(value) => setCssType(value || "normal")}
+          onChange={(cssType) => {
+            setPendingCSSType(cssType || "normal");
+            open();
+          }}
           data={[
             { value: "normal", label: "Normal CSS" },
             { value: "tailwind", label: "Tailwind CSS" },
             { value: "bootstrap", label: "Bootstrap CSS" },
           ]}
-          mb="md"
         />
-        {isSaved ? "Changes saved!" : "Saving changes..."}
         <Challenge
           objectives={activeChallengeData?.challenge?.objectives ?? [""]}
           isActive={activeChallengeData?.challenge?.isActive ?? true}
           imageUrl={activeChallengeData?.challenge?.imageUrl ?? ""}
         />
-      </Flex>
 
-      <Flex justify="center" gap="md" align="center">
+        {isSaved ? "Changes saved!" : ""}
+      </Flex>
+      <Modal opened={opened} onClose={close} title="Changing CSS Type">
+        <Flex direction="column" gap="lg" align="center">
+          <Text>
+            Changing the CSS Type to `{pendingCSSType}` will erase your current
+            code. Are you sure you want to do it?
+          </Text>
+          <Flex direction="row" gap="md">
+            <Button
+              onClick={() => {
+                setCssType(pendingCSSType);
+                setPendingCSSType("normal");
+                close();
+              }}
+            >
+              Yes - change it
+            </Button>
+            <Button
+              variant="subtle"
+              onClick={() => {
+                close();
+              }}
+            >
+              No - take me back
+            </Button>
+          </Flex>
+        </Flex>
+      </Modal>
+
+      <Flex gap="md">
         <CodeEditor
           value={value}
           onChange={handleChangeValue}

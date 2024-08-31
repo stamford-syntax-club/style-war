@@ -140,7 +140,6 @@ func (h *Hub) handleCodeSubmission(msg *Msg) {
 		return
 	}
 
-	log.Printf("%+v\n", msg.Code)
 	h.clients[msg.Code.UserId].Conn.WriteMessage(
 		websocket.TextMessage,
 		[]byte(fmt.Sprintf("Submission from %s for challenge %d received!",
