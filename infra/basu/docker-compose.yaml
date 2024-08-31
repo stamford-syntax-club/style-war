@@ -37,7 +37,7 @@ services:
     restart: always
 
   backend:
-    image: chinathaip/stylewars-be:17-aug
+    image: chinathaip/stylewars-be:28-aug
     ports:
       - "8080:8080"
     environment:
@@ -49,4 +49,4 @@ services:
       - DB_PORT=${DB_PORT}
     networks:
       - style-wars
-    restart: always
+    restart: unless-stopped
