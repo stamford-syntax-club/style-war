@@ -7,14 +7,14 @@ import {
   Flex,
   Card,
   Box,
-  Modal,
   Code,
+  Select,
+  NumberInput,
 } from "@mantine/core";
 import { useState } from "react";
-import TasksDropdown from "@/components/admin/tasks_dropdown";
 import SelectTimer from "@/components/admin/select_timer";
 import Preview from "@/components/preview";
-import { useDisclosure } from "@mantine/hooks";
+import { useAllChallenge } from "@/lib/data-hooks/use-all-challenge";
 
 interface Message {
   event: string;
@@ -26,6 +26,10 @@ export default function AdminPage() {
   const [codes, setCodes] = useState<Record<string, string>>({});
   const [remainingTime, setRemainingTime] = useState(0);
   const { mutate } = useSetActiveChallenge();
+  const { data: allChallengeData } = useAllChallenge();
+
+  const [selectedChallenge, setSelectedChallenge] = useState(0);
+  const [selectedDuration, setSelectedDuration] = useState<string | number>(2);
   const [viewModes, setViewModes] = useState<
     Record<string, "rendered" | "source">
   >({});
@@ -61,29 +65,14 @@ export default function AdminPage() {
 
   return (
     <Container fluid>
-      <Box className="sticky top-[58px] bg-neutral-900 rounded-2xl h-16 content-center">
-        <Flex justify="space-evenly" align="center">
-          <div className="flex flex-rows">
-            <Button
-              onClick={() => {
-                mutate({ id: 1, duration: 2 });
-              }}
-              w={42}
-              h={42}
-              radius="md"
-              mx={10}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              ➤
-            </Button>
-            <TasksDropdown />
-            <SelectTimer />
-          </div>
-
+      <Box className="sticky top-[58px] rounded-2xl h-16 content-center mb-10">
+        <Flex
+          direction="column"
+          justify="center"
+          className="w-full"
+          align="center"
+          mb="md"
+        >
           <Text
             size="32px"
             fw={900}
@@ -92,33 +81,81 @@ export default function AdminPage() {
           >
             ADMIN PANEL
           </Text>
+          <Text className="text-xl">Time left: {remainingTime}</Text>
+        </Flex>
+        <Flex justify="center" align="end" gap="sm">
+          <Flex justify="start" align="end" gap="sm">
+            {allChallengeData?.allChallenge && (
+              <Select
+                label="Select Challange"
+                onChange={(value) => {
+                  if (value) setSelectedChallenge(parseInt(value));
+                }}
+                data={
+                  allChallengeData.allChallenge.map((challenge) => {
+                    return {
+                      label:
+                        `${challenge?.id?.toString()}${
+                          challenge?.isActive ? "-active" : ""
+                        }` || "",
+                      value: challenge?.id?.toString() || "",
+                    };
+                  }) || []
+                }
+              />
+            )}
+            <NumberInput
+              label="Duration (minutes)"
+              min={2}
+              value={selectedDuration}
+              onChange={setSelectedDuration}
+            />
+            <Button
+              onClick={() => {
+                let duration = 0;
+                if (typeof selectedDuration === "string") {
+                  duration = 0;
+                }
 
-          <div className="flex flex-rows">
-            <Text className="text-xl mr-4">Current Task: [Something]</Text>
-            <Text className="text-xl">Time left: {remainingTime}</Text>
-          </div>
+                if (typeof selectedDuration === "number") {
+                  duration = selectedDuration;
+                }
+                mutate({
+                  id: selectedChallenge,
+                  duration: duration,
+                });
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              Start
+            </Button>
+          </Flex>
+        </Flex>
+        <Flex align="center" justify="center" wrap="wrap" mt="xl">
+          {Object.entries(codes).map(([userId, code]) => (
+            <Card key={`${userId}-code`}>
+              <Text fw={500}>{userId}</Text>
+              <Button
+                onClick={() => toggleViewMode(userId)}
+                className="absolute top-2 right-4 h-[30px] w-[120px]"
+              >
+                Source
+              </Button>
+              {viewModes[userId] === "source" ? (
+                <Code block w={540} h={720}>
+                  {code}
+                </Code>
+              ) : (
+                <Preview value={code} />
+              )}
+            </Card>
+          ))}
         </Flex>
       </Box>
-      <Flex align="center" justify="center" wrap="wrap">
-        {Object.entries(codes).map(([userId, code]) => (
-          <Card key={`${userId}-code`}>
-            <Text fw={500}>{userId}</Text>
-            <Button
-              onClick={() => toggleViewMode(userId)}
-              className="absolute top-2 right-4 h-[30px] w-[120px]"
-            >
-              Source
-            </Button>
-            {viewModes[userId] === "source" ? (
-              <Code block w={540} h={720}>
-                {code}
-              </Code>
-            ) : (
-              <Preview value={code} />
-            )}
-          </Card>
-        ))}
-      </Flex>
     </Container>
   );
 }
