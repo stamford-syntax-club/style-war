@@ -51,13 +51,13 @@ export default function Playground() {
   };
 
   return (
-    <Flex direction="column" justify="center">
+    <Flex direction="column">
       <Flex
         gap="md"
         direction="row"
-        align="center"
-        mb="lg"
-        className="w-[90%] self-center"
+        className="w-[90%] self-center items-center"
+        mb="md"
+        align="end"
       >
         <Select
           label="Choose CSS type"
@@ -68,7 +68,6 @@ export default function Playground() {
             { value: "tailwind", label: "Tailwind CSS" },
             { value: "bootstrap", label: "Bootstrap CSS" },
           ]}
-          mb="md"
         />
         {/* TODO: add hardcoded challenge here! */}
         <Challenge

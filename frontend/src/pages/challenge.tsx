@@ -19,7 +19,7 @@ export default function Challenge({ objectives, imageUrl }: challenge) {
         size="auto"
         title="Current Challenge"
       >
-        <Flex gap="md" mt="md" className="min-h-[750px]">
+        <Flex gap="md" mt="md" className="min-h-[750px] self-center">
           <Obj value={objectives ?? ["no objective"]} />
           <Ref img={imageUrl} />
         </Flex>
