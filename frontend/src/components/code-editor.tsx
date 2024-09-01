@@ -7,16 +7,20 @@ interface CodeEditorProps {
   value: string;
   onChange: (value: string | undefined) => void;
   remainingTime: number | null;
+  practice: boolean;
 }
 
 export default function CodeEditor({
   value,
   onChange,
   remainingTime,
+  practice,
 }: CodeEditorProps) {
   const editorRef = useRef<any>(null);
-  const isDisabled = remainingTime === 0 || remainingTime === null;
   const clerk = useClerk();
+
+  const isDisabled =
+    !practice && (remainingTime === 0 || remainingTime === null);
 
   useEffect(() => {
     if (editorRef.current) {
@@ -31,7 +35,7 @@ export default function CodeEditor({
         <Editor
           className="border border-gray-600 rounded p-1 "
           height="80vh"
-          width="60vw"
+          width="65vw"
           defaultLanguage="html"
           language="html, css"
           defaultValue=""

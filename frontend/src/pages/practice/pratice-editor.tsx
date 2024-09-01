@@ -1,5 +1,5 @@
 import Editor from "@monaco-editor/react";
-import { Box, Title, Flex } from "@mantine/core";
+import { Box } from "@mantine/core";
 
 interface PracticeEditorProps {
   value: string;
@@ -13,13 +13,9 @@ export default function PracticeEditor({
 }: PracticeEditorProps) {
   return (
     <Box>
-      <Flex align="center" justify="space-between">
-        <Box className="flex justify-end"></Box>
-      </Flex>
       <Editor
-        className="border border-gray-600 rounded p-1 "
-        height="80vh"
-        width="50vw"
+        className="border border-gray-600 rounded p-1"
+        width="100vh"
         defaultLanguage="html"
         language="html, css"
         defaultValue=""

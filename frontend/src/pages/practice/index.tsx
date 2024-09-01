@@ -1,8 +1,8 @@
 import { Flex, Title, Select } from "@mantine/core";
-import PracticeEditor from "./pratice-editor";
 import Preview from "@/components/preview";
 import { useEffect, useState } from "react";
 import Challenge from "../challenge";
+import CodeEditor from "@components/code-editor";
 
 export default function Playground() {
   const [cssType, setCssType] = useState<string>("normal");
@@ -52,10 +52,14 @@ export default function Playground() {
 
   return (
     <Flex direction="column" justify="center" align="center">
-      <Flex justify="center" gap="md" align="center" w="80%">
+      <Flex
+        justify="start"
+        gap="md"
+        align="center"
+        className="w-[95%] self-center"
+      >
         <Select
           label="Choose CSS type"
-          className="justify-self-start"
           value={cssType}
           onChange={(value) => setCssType(value || "normal")}
           data={[
@@ -82,7 +86,12 @@ export default function Playground() {
       </Flex>
 
       <Flex justify="center" gap="md" align="center">
-        <PracticeEditor value={value} onChange={handleChangeValue} />
+        <CodeEditor
+          value={value}
+          onChange={handleChangeValue}
+          remainingTime={80}
+          practice={true}
+        />
         <Preview value={value} />
       </Flex>
     </Flex>

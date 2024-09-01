@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Flex, Modal, Button } from "@mantine/core";
+import { Flex, Modal, Button } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Ref from "@/components/challenge-ref";
 import Obj from "@/components/challenge-obj";
@@ -19,7 +19,7 @@ export default function Challenge({ objectives, imageUrl }: challenge) {
         size="auto"
         title="Current Challenge"
       >
-        <Flex gap="md" mt="md">
+        <Flex gap="md" mt="md" className="min-h-[750px]">
           <Obj value={objectives ?? ["no objective"]} />
           <Ref img={imageUrl} />
         </Flex>

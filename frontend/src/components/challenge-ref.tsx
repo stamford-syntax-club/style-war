@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { Flex, Box, Title, Button, Stack } from "@mantine/core";
+import { Flex, Box, Title, Stack } from "@mantine/core";
 
 type type = { img: string };
 
@@ -15,8 +15,7 @@ export default function Ref({ img }: type) {
           src={img}
           sizes="100vw"
           alt="Picture of the author"
-          height={720}
-          width={540}
+          fill
           objectFit="cover"
           quality={100}
         />

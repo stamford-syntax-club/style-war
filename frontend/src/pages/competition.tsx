@@ -97,7 +97,7 @@ export default function Playground() {
           code: debouncedValue,
           challengeId: activeChallengeData?.challenge?.id,
         },
-      }),
+      })
     );
 
     setIsSaved(true);
@@ -115,16 +115,22 @@ export default function Playground() {
   };
 
   return (
-    <Flex direction="column">
-      <Title order={4} className="text-gray-400">
+    <Flex direction="column" justify="center">
+      <Title order={4} className="text-gray-400 self-center">
         {remainingTime === 0
           ? "Time's up!"
           : remainingTime !== null
-            ? `Remaining Time: ${remainingTime}s`
-            : "Waiting for admin to start next challenge..."}
+          ? `Remaining Time: ${remainingTime}s`
+          : "Waiting for admin to start next challenge..."}
       </Title>
 
-      <Flex align="end" direction="row" gap="md" mb="md">
+      <Flex
+        align="end"
+        direction="row"
+        gap="md"
+        mb="lg"
+        className="w-[95%] self-center"
+      >
         <Select
           label="Choose CSS type"
           value={cssType}
@@ -174,13 +180,14 @@ export default function Playground() {
         </Flex>
       </Modal>
 
-      <Flex gap="md">
+      <Flex justify="center" gap="md">
         <CodeEditor
           value={value}
           onChange={handleChangeValue}
           remainingTime={
             searchParams.get("mode") === "dev" ? 999999999999 : remainingTime
           }
+          practice={false}
         />
         <Preview value={value} />
       </Flex>
