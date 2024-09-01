@@ -153,7 +153,7 @@ export default function AdminPage() {
                 Source
               </Button>
               {viewModes[userId] === "source" ? (
-                <Code block w={540} h={720}>
+                <Code block w={540} h={735}>
                   {code}
                 </Code>
               ) : (

@@ -6,7 +6,7 @@ type type = { img: string };
 
 export default function Ref({ img }: type) {
   return (
-    <Box className="w-[540px] h-[720px]">
+    <Box className="w-[540px] h-[735px]">
       <Flex direction="row" justify="space-between">
         <Title order={3}>Reference</Title>
       </Flex>
@@ -15,7 +15,8 @@ export default function Ref({ img }: type) {
           src={img}
           sizes="100vw"
           alt="Picture of the author"
-          fill
+          width={540}
+          height={735}
           objectFit="cover"
           quality={100}
         />

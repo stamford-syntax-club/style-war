@@ -129,7 +129,7 @@ export default function Playground() {
         direction="row"
         gap="md"
         mb="lg"
-        className="w-[95%] self-center"
+        className="w-[90%] self-center"
       >
         <Select
           label="Choose CSS type"

@@ -51,12 +51,13 @@ export default function Playground() {
   };
 
   return (
-    <Flex direction="column" justify="center" align="center">
+    <Flex direction="column" justify="center">
       <Flex
-        justify="start"
         gap="md"
+        direction="row"
         align="center"
-        className="w-[95%] self-center"
+        mb="lg"
+        className="w-[90%] self-center"
       >
         <Select
           label="Choose CSS type"
