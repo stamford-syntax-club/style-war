@@ -54,7 +54,7 @@ func main() {
 	if err != nil {
 		log.Fatalln("failed to connect database: " + err.Error())
 	}
-	db.Exec("DEALLOCATE ALL")
+	// db.Exec("DEALLOCATE ALL")
 	if err := db.AutoMigrate(&challenge.Challenge{}); err != nil {
 		log.Println("failed to migrate challenge table: " + err.Error())
 	}
