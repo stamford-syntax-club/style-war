@@ -15,7 +15,8 @@ export default function Ref({ img }: type) {
           src={img}
           sizes="100vw"
           alt="Picture of the author"
-          fill
+          height={720}
+          width={540}
           objectFit="cover"
           quality={100}
         />
