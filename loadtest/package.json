@@ -4,7 +4,7 @@
   "description": "",
   "main": "test-websocket.js",
   "scripts": {
-    "loadtest-ws": "k6 run --vus 5 --duration 2m test-websocket.js"
+    "loadtest-ws": "k6 run --vus 14 --duration 9m test-websocket.js"
   },
   "author": "",
   "license": "ISC"
