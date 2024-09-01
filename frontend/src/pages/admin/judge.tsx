@@ -1,3 +1,4 @@
+import CodeCard from "@/components/code-card";
 import Preview from "@/components/preview";
 import { useAllChallenge } from "@/lib/data-hooks/use-all-challenge";
 import { useCodeForChallenge } from "@/lib/data-hooks/use-all-code-for-challenge";
@@ -36,15 +37,9 @@ export default function AdminJudgingPage() {
 
       {isError && error.message}
       {!isLoading && (
-        <Flex align="center" justify="center" wrap="wrap">
+        <Flex align="center" justify="center" wrap="wrap" mt="sm">
           {codeForChallengeData?.codeForChallenge?.map((code) => (
-            <Card
-              key={`${code?.userId}-code`}
-              className="justify-center items-center m-2 bg-neutral-900 text-white relative"
-            >
-              <Text fw={500}>{code?.userId}</Text>
-              <Preview value={code?.code || ""} />
-            </Card>
+            <CodeCard userId={code?.userId || ""} code={code?.code || ""} />
           ))}
         </Flex>
       )}
