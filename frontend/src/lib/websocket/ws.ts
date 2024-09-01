@@ -4,7 +4,7 @@ import { MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 
 export function useSocket(
   onMessage: (ev: MessageEvent<any>) => void,
-  room: string = "competition"
+  room: string = "competition",
 ) {
   const { session } = useSession();
   const [token, setToken] = useState("");
@@ -24,7 +24,7 @@ export function useSocket(
       const ws = new WebSocket(
         `${backendURL.protocol === "http:" ? "ws" : "wss"}://${
           backendURL.host
-        }/ws/${room}?token=${token}`
+        }/ws/${room}?token=${token}`,
       );
       ws.onopen = function () {
         notifications.show({
@@ -68,6 +68,6 @@ export function useSocket(
   }, [token]);
 
   return {
-    socket: useMemo(() => socket.current, [token, socket.current]),
+    socket: useMemo(() => socket.current, [session, socket.current]),
   };
 }

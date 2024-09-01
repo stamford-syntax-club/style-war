@@ -131,6 +131,11 @@ func (h *Hub) handleCodeSubmission(msg *Msg) {
 	challengeExpiredTime := h.challengeExpiration[msg.Code.ChallengeId]
 	h.mutex.Unlock()
 
+	if _, exist := h.clients[msg.Code.UserId]; !exist {
+		log.Printf("client: %s doesn't exist in hub", msg.Code.UserId)
+		return
+	}
+
 	if time.Now().After(challengeExpiredTime) {
 		log.Printf("submission for challenge: %d is expired", msg.Code.ChallengeId)
 		err := h.clients[msg.Code.UserId].Conn.WriteMessage(websocket.TextMessage, []byte("Time is up!"))
