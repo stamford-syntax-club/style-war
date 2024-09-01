@@ -26,9 +26,16 @@ export default function AdminPage() {
   const [codes, setCodes] = useState<Record<string, string>>({});
   const [remainingTime, setRemainingTime] = useState(0);
   const { mutate } = useSetActiveChallenge();
+  const [viewModes, setViewModes] = useState<
+    Record<string, "rendered" | "source">
+  >({});
 
-  const [opened, { open, close }] = useDisclosure(false);
-  const [currentSourceCode, setCurrentSourceCode] = useState("");
+  const toggleViewMode = (userId: string) => {
+    setViewModes((prev) => ({
+      ...prev,
+      [userId]: prev[userId] === "rendered" ? "source" : "rendered",
+    }));
+  };
 
   useSocket((message) => {
     try {
@@ -97,24 +104,18 @@ export default function AdminPage() {
           <Card key={`${userId}-code`}>
             <Text fw={500}>{userId}</Text>
             <Button
-              onClick={() => {
-                setCurrentSourceCode(userId);
-                open();
-              }}
+              onClick={() => toggleViewMode(userId)}
               className="absolute top-2 right-4 h-[30px] w-[120px]"
             >
               Source
             </Button>
-            <Modal
-              size="xl"
-              opened={opened}
-              onClose={close}
-              title={`Source code: ${currentSourceCode}`}
-            >
-              <Code block> {code}</Code>
-            </Modal>
-
-            <Preview value={code} />
+            {viewModes[userId] === "source" ? (
+              <Code block w={540} h={720}>
+                {code}
+              </Code>
+            ) : (
+              <Preview value={code} />
+            )}
           </Card>
         ))}
       </Flex>
