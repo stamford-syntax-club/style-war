@@ -1,6 +1,9 @@
 package challenge
 
 import (
+	"log"
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -31,7 +34,7 @@ func (chr *ChallengeRepoImpl) GetAllChallenges(fields ...string) ([]Challenge, e
 	return challenges, nil
 }
 
-func (chr *ChallengeRepoImpl) SetActiveChallenge(id int) {
+func (chr *ChallengeRepoImpl) SetActiveChallenge(id int, startTime time.Time, duration int) {
 	/*
 	   UPDATE challenges
 	   SET is_active = FALSE
@@ -42,6 +45,15 @@ func (chr *ChallengeRepoImpl) SetActiveChallenge(id int) {
 	   WHERE "id" = 2;
 	*/
 
-	chr.db.Exec("UPDATE challenges SET is_active = FALSE WHERE is_active = TRUE")
-	chr.db.Exec("UPDATE challenges SET is_active = TRUE WHERE id = ?", id)
+	// to support dynamic schena prefix
+	if result := chr.db.Model(&Challenge{}).Where("is_active = true").Update("is_active", false); result.Error != nil {
+		log.Println("error deactivating active challenge: ", result.Error)
+	}
+
+	if result := chr.db.Model(&Challenge{}).Where("id = ?", id).Update("is_active", true).Update("start_time", startTime).Update("duration", duration); result.Error != nil {
+		log.Println("error activating challenge: ", result.Error)
+	}
+
+	// chr.db.Exec("UPDATE challenges SET is_active = FALSE WHERE is_active = TRUE")
+	// chr.db.Exec("UPDATE challenges SET is_active = TRUE WHERE id = ?", id)
 }

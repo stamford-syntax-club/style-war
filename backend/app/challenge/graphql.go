@@ -91,12 +91,13 @@ func newGqlMutations(challengeRepo ChallengeRepo, timerCh chan Challenge) graphq
 			id := input["id"].(int)
 			duration := input["duration"].(int)
 
+			startTime := time.Now()
 			// TODO: update active challenge in db
-			challengeRepo.SetActiveChallenge(id)
+			challengeRepo.SetActiveChallenge(id, startTime, duration)
 
 			// start the timer
 			// extra 15 seconds to prevent the case where client's code update interval came after the expiration
-			timerCh <- Challenge{ID: id, StartTime: time.Now(), Duration: time.Duration(duration)}
+			timerCh <- Challenge{ID: id, StartTime: startTime, Duration: time.Duration(duration)}
 			return nil, nil
 		},
 	}
