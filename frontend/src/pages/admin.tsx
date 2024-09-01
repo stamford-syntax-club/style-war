@@ -12,9 +12,10 @@ import {
   NumberInput,
 } from "@mantine/core";
 import { useState } from "react";
-import SelectTimer from "@/components/admin/select_timer";
 import Preview from "@/components/preview";
 import { useAllChallenge } from "@/lib/data-hooks/use-all-challenge";
+import { useChallenge } from "@/lib/data-hooks/use-challenge";
+import Challenge from "./challenge";
 
 interface Message {
   event: string;
@@ -27,6 +28,7 @@ export default function AdminPage() {
   const [remainingTime, setRemainingTime] = useState(0);
   const { mutate } = useSetActiveChallenge();
   const { data: allChallengeData } = useAllChallenge();
+  const { data: activeChallengeData } = useChallenge();
 
   const [selectedChallenge, setSelectedChallenge] = useState(0);
   const [selectedDuration, setSelectedDuration] = useState<string | number>(2);
@@ -84,6 +86,11 @@ export default function AdminPage() {
           <Text className="text-xl">Time left: {remainingTime}</Text>
         </Flex>
         <Flex justify="center" align="end" gap="sm">
+          <Challenge
+            objectives={activeChallengeData?.challenge?.objectives ?? [""]}
+            isActive={activeChallengeData?.challenge?.isActive ?? true}
+            imageUrl={activeChallengeData?.challenge?.imageUrl ?? ""}
+          />
           <Flex justify="start" align="end" gap="sm">
             {allChallengeData?.allChallenge && (
               <Select
