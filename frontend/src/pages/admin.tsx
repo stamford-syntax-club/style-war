@@ -16,6 +16,7 @@ import Preview from "@/components/preview";
 import { useAllChallenge } from "@/lib/data-hooks/use-all-challenge";
 import { useChallenge } from "@/lib/data-hooks/use-challenge";
 import Challenge from "./challenge";
+import CodeCard from "@/components/code-card";
 
 interface Message {
   event: string;
@@ -144,22 +145,23 @@ export default function AdminPage() {
         </Flex>
         <Flex align="center" justify="center" wrap="wrap" mt="xl">
           {Object.entries(codes).map(([userId, code]) => (
-            <Card key={`${userId}-code`}>
-              <Text fw={500}>{userId}</Text>
-              <Button
-                onClick={() => toggleViewMode(userId)}
-                className="absolute top-2 right-4 h-[30px] w-[120px]"
-              >
-                Source
-              </Button>
-              {viewModes[userId] === "source" ? (
-                <Code block w={540} h={735}>
-                  {code}
-                </Code>
-              ) : (
-                <Preview value={code} />
-              )}
-            </Card>
+            // <Card key={`${userId}-code`}>
+            //   <Text fw={500}>{userId}</Text>
+            //   <Button
+            //     onClick={() => toggleViewMode(userId)}
+            //     className="absolute top-2 right-4 h-[30px] w-[120px]"
+            //   >
+            //     Source
+            //   </Button>
+            //   {viewModes[userId] === "source" ? (
+            //     <Code block w={540} h={735}>
+            //       {code}
+            //     </Code>
+            //   ) : (
+            //     <Preview value={code} />
+            //   )}
+            // </Card>
+            <CodeCard userId={userId} code={code} />
           ))}
         </Flex>
       </Box>
