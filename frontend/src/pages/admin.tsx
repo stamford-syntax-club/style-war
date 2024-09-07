@@ -1,22 +1,21 @@
 import { useSetActiveChallenge } from "@/lib/data-hooks/use-set-challenge";
-import { useSocket } from "@/lib/websocket/ws";
 import {
   Button,
   Container,
   Text,
   Flex,
-  Card,
   Box,
-  Code,
   Select,
   NumberInput,
 } from "@mantine/core";
-import { useState } from "react";
-import Preview from "@/components/preview";
+import { useEffect, useState } from "react";
 import { useAllChallenge } from "@/lib/data-hooks/use-all-challenge";
 import { useChallenge } from "@/lib/data-hooks/use-challenge";
 import Challenge from "./challenge";
 import CodeCard from "@/components/code-card";
+import useWebsocket from "react-use-websocket";
+import { useSession } from "@clerk/nextjs";
+import { notifications } from "@mantine/notifications";
 
 interface Message {
   event: string;
@@ -33,38 +32,62 @@ export default function AdminPage() {
 
   const [selectedChallenge, setSelectedChallenge] = useState(0);
   const [selectedDuration, setSelectedDuration] = useState<string | number>(2);
-  const [viewModes, setViewModes] = useState<
-    Record<string, "rendered" | "source">
-  >({});
 
-  const toggleViewMode = (userId: string) => {
-    setViewModes((prev) => ({
-      ...prev,
-      [userId]: prev[userId] === "rendered" ? "source" : "rendered",
-    }));
-  };
-
-  useSocket((message) => {
-    try {
-      const msg = JSON.parse(message.data) as Message;
-      if (msg.event === "timer:status") {
-        console.log("remaining time", msg.remainingTime);
-        setRemainingTime(msg.remainingTime);
-      }
-
-      if (msg.event === "code:edit") {
-        console.log(msg);
-        setCodes((prev) => {
-          return {
-            ...prev,
-            [msg.code.userId]: msg.code.code,
-          };
+  const { session } = useSession();
+  const [token, setToken] = useState("");
+  const backendURL = new URL(process.env.NEXT_PUBLIC_BACKEND_URL || "");
+  useWebsocket(
+    `${backendURL.protocol === "http:" ? "ws" : "wss"}://${backendURL.host}/ws/admin?token=${token}`,
+    {
+      onOpen: () => {
+        notifications.show({
+          title: "Connection Status",
+          message: "Connection to backend is established!",
+          color: "green",
         });
-      }
-    } catch (error) {
-      console.warn("Failed to parse message:", error, "Data:", message.data);
-    }
-  }, "admin");
+      },
+      onMessage: (message) => {
+        try {
+          const msg = JSON.parse(message.data) as Message;
+          if (msg.event === "timer:status") {
+            console.log("remaining time", msg.remainingTime);
+            setRemainingTime(msg.remainingTime);
+          }
+
+          if (msg.event === "code:edit") {
+            console.log(msg);
+            setCodes((prev) => {
+              return {
+                ...prev,
+                [msg.code.userId]: msg.code.code,
+              };
+            });
+          }
+        } catch (error) {
+          console.warn(
+            "Failed to parse message:",
+            error,
+            "Data:",
+            message.data,
+          );
+        }
+      },
+      shouldReconnect: () => true,
+      onClose: () => {
+        notifications.show({
+          title: "Connection Status",
+          message: "Connection lost, attempting to reconnect",
+          color: "orange",
+        });
+      },
+    },
+  );
+
+  useEffect(() => {
+    session
+      ?.getToken({ template: "style-wars" })
+      .then((token) => setToken(token || ""));
+  }, [session]);
 
   return (
     <Container fluid>

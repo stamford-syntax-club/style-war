@@ -9,6 +9,8 @@ import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useChallenge } from "@/lib/data-hooks/use-challenge";
 import { notifications } from "@mantine/notifications";
 import Challenge from "./challenge";
+import { useSession } from "@clerk/nextjs";
+import useWebSocket from "react-use-websocket";
 
 interface Message {
   event: string;
@@ -66,15 +68,51 @@ export default function Playground() {
 
   const [opened, { open, close }] = useDisclosure();
 
-  const { socket } = useSocket((message) => {
-    try {
-      const msg = JSON.parse(message.data) as Message;
-      console.log("Received message:", msg);
-      setRemainingTime(msg.remainingTime);
-    } catch (error) {
-      console.warn("Failed to parse message:", error, "Data:", message.data);
-    }
-  });
+  const { session } = useSession();
+  const [token, setToken] = useState("");
+  const backendURL = new URL(process.env.NEXT_PUBLIC_BACKEND_URL || "");
+  const { sendMessage } = useWebSocket(
+    `${backendURL.protocol === "http:" ? "ws" : "wss"}://${
+      backendURL.host
+    }/ws/competition?token=${token}`,
+    {
+      onOpen: () => {
+        notifications.show({
+          title: "Connection Status",
+          message: "Connection to backend is established!",
+          color: "green",
+        });
+      },
+      onMessage: (message) => {
+        try {
+          const msg = JSON.parse(message.data) as Message;
+          console.log("Received message:", msg);
+          setRemainingTime(msg.remainingTime);
+        } catch (error) {
+          console.warn(
+            "Failed to parse message:",
+            error,
+            "Data:",
+            message.data,
+          );
+        }
+      },
+      shouldReconnect: () => true,
+      onClose: () => {
+        notifications.show({
+          title: "Connection Status",
+          message: "Connection lost, attempting to reconnect",
+          color: "orange",
+        });
+      },
+    },
+  );
+
+  useEffect(() => {
+    session
+      ?.getToken({ template: "style-wars" })
+      .then((token) => setToken(token || ""));
+  }, [session]);
 
   useEffect(() => {
     if (isLoading || !codeData?.code?.code) return;
@@ -89,15 +127,14 @@ export default function Playground() {
 
   useEffect(() => {
     if (!activeChallengeData?.challenge?.id) return;
-
-    socket?.send(
+    sendMessage(
       JSON.stringify({
         event: "code:edit",
         code: {
           code: debouncedValue,
           challengeId: activeChallengeData?.challenge?.id,
         },
-      })
+      }),
     );
 
     setIsSaved(true);
@@ -120,8 +157,8 @@ export default function Playground() {
         {remainingTime === 0
           ? "Time's up!"
           : remainingTime !== null
-          ? `Remaining Time: ${remainingTime}s`
-          : "Waiting for admin to start next challenge..."}
+            ? `Remaining Time: ${remainingTime}s`
+            : "Waiting for admin to start next challenge..."}
       </Title>
 
       <Flex

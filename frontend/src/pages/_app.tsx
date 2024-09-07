@@ -43,7 +43,7 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
 
       <MantineProvider theme={theme} defaultColorScheme="dark">
-        <Notifications position="top-right" limit={1} />
+        <Notifications position="top-right" />
         <QueryClientProvider client={queryClient}>
           <ClerkProvider
             appearance={{
