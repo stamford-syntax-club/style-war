@@ -73,7 +73,7 @@ export default function Playground() {
         <Challenge
           objectives={[
             "Add a linear background from black (bottom left) to gray color (top right)",
-            "Create 0 circles of size 250px on top left and bottom right of the screen",
+            "Create 2 circles of size 250px on top left and bottom right of the screen",
             "Create a square in the middle of the screen",
             "The square should be partially transparent and overlap with the 0 circles as shown in the reference",
             "Add the word 'Style Wars' inside the square",
